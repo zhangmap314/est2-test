@@ -1,0 +1,139 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<script type="text/javascript" src="./common/common.js"></script>
+
+	<title>環境情報メンテナンス</title>
+<noscript>
+<META HTTP-EQUIV=Refresh CONTENT="0; URL=./noscript.html">
+</noscript>
+<script type="text/javascript">
+<!--
+	//check:1:テキストボックス入力;　check:0:プルダウンメニュー選択
+	function Select_Type(flg){
+		var objname = document.form2.elements;
+		if(flg == 1){
+			//プルダウンメニュー選択不可
+			objname["co2_coefficient"].disabled = false;
+			objname["denryoku_keisu"].selectedIndex = 0;
+			objname["denryoku_keisu"].disabled = true;
+			objname["denryoku_keisu"].value = "";
+		}else if(flg == 0){
+			//テキストボックス入力不可
+			objname["co2_coefficient"].value = "";
+			objname["co2_coefficient"].disabled = true;
+			objname["denryoku_keisu"].disabled = false;
+			if(objname["denryoku_keisu"].selectedIndex < 0){
+				objname["denryoku_keisu"].selectedIndex = 0;
+			}
+		}else{
+			//初期画面
+			//プルダウンメニュー選択不可
+			objname["co2_coefficient"].disabled = false;
+			objname["denryoku_keisu"].selectedIndex = 0;
+			objname["denryoku_keisu"].disabled = true;
+			objname["denryoku_keisu"].value = "";
+		}
+	}
+-->
+
+</script>
+</head>
+<body>
+	<form name="form1" action="Menu.php" method="post">
+		<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+		<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+		<table width="100%" class="header">
+			<tr>
+				<td nowrap><font class="PageTitle">環境情報メンテナンス</font></td>
+				<td width="100" nowrap>
+					<input type="button" class="CloseButton" name="logadmin" value="　閉じる　" onclick="window.close();">
+				</td>
+			</tr>
+		</table>
+	</form>
+
+	<br>
+
+	<form name="form2" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+		<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+		<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+
+		<?php $data = $result->get('ecoinfo'); ?>
+		<table border="0" align="center" width="70%" cellspacing="0">
+			<tr>
+				<td colspan=2 class=error> 
+					<?=$result->get('err')?> 
+				</td>
+			</tr>
+		</table>
+
+		<table border="0" align="center" width="70%" cellspacing="0">
+			<tr>
+				<td align="left">
+					<b>換算係数表</b>
+				</td>
+			</tr>
+		</table>
+
+		<table border="1" align="center" width="70%" bordercolor="gray" cellspacing="0">
+			<tr>
+				<th align="right" nowrap>電気料金単価</th>
+				<td nowrap>
+					<input type="text" style="ime-mode: disabled;" maxlength="7" name="electricity_cost" value="<?=common::value_encode($data["electricity_cost"])?>" size="40" >円/kWh
+					<font class="comment">&nbsp;&nbsp;※半角数字</font>
+				</td>
+			</tr>
+
+			<tr>
+				<th align="right" nowrap >CO<sub>2</sub>排出係数</th>
+				<td nowrap>
+					<input type="radio" name="Type_radio1" value="1" id="Type_text" <?php if($request->get("Type_radio1") != "0") {print ("checked");}?> onclick="Select_Type(1);">
+					<input type="text" style="ime-mode: disabled;" maxlength="7" name="co2_coefficient" value="<?=common::value_encode($data["co2_coefficient"])?>" size="40" >kg-CO<sub>2</sub>/kWh
+					<font class="comment">&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp※半角数字</font>
+					<br>
+					<input type="radio" name="Type_radio1" value="0" id="Type_radio" <?php if($request->get("Type_radio1") == "0") {print ("checked");}?> onclick="Select_Type(0);">
+					<select name="denryoku_keisu">
+							<?=common::createoptions($result->get("co2keisulist"),"co2_coefficient","corp_name",$request->get("denryoku_keisu"))?>
+					</select>kg-CO<sub>2</sub>/kWh
+				</td>
+			</tr>
+			<tr>
+				<th align="right" nowrap>立木CO<sub>2</sub>年間吸収量</th>
+				<td nowrap>
+					<input type="text"  style="ime-mode: disabled;" maxlength="7" name="co2_to_tree" value="<?=common::value_encode($data["co2_to_tree"])?>" size="40" >kg/本
+					<font class="comment">&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp※半角数字</font>
+				</td>
+			</tr>
+			<tr>
+				<th align="right" nowrap>年間週数</th>
+				<td nowrap>
+					<input type="text"  style="ime-mode: disabled;" maxlength="2" name="weeks" value="<?=common::value_encode($data["weeks"])?>" size="40" >週
+					<font class="comment">&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp※半角数字</font>
+				</td>
+			</tr>
+		</table>
+
+		<br>
+		
+		<table border="0" align="center" width="50%">
+			<tr>
+				<td align="center" nowrap><input type="submit" class="button" name="kojintoroku" value="個人データ登録"></td>
+				<td align="center" nowrap><input type="submit" class="button" name="showdefault" value="　初期値　"></td>
+			</tr>
+		</table>
+	</form>
+</body>
+<script type="text/javascript" language="javascript">
+<!--
+
+ 	Select_Type(<?=($request->get("Type_radio1"));?>);
+	<?php if($result->get("jsalert") != ""){ ?> alert('<?=$result->get("jsalert") ?>'); <?php } ?>
+
+-->
+</script>
+</html>

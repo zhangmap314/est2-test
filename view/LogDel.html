@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title></title>
+	
+	<script language="javascript">
+	
+	function doDelLog(){
+		
+		<?php if($result->get("delDone") != "" ){ ?>
+		<?php if($result->get("JSAlert") != ""){ ?> alert('<?=$result->get("JSAlert") ?>'); <?php } ?>
+		window.close();
+		return false;
+		<?php } ?>
+		
+		if(!confirm('データは消滅します。本当によろしいですか？')){
+			window.close();
+			return false;
+		}
+		document.frm1.submit();
+		
+	}
+	
+	</script>
+	 
+</head>
+<body onload="doDelLog();">
+<form name="frm1" action="<?=$_SERVER['SCRIPT_NAME']?>" method="POST">
+
+<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+
+<input type="hidden" name="target_log" value="<?=$request->get("target_log")?>">
+<input type="hidden" name="fromyear" value="<?=$request->get("fromyear")?>">
+<input type="hidden" name="frommonth" value="<?=$request->get("frommonth")?>">
+<input type="hidden" name="fromday" value="<?=$request->get("fromday")?>">
+<input type="hidden" name="toyear" value="<?=$request->get("toyear")?>">
+<input type="hidden" name="tomonth" value="<?=$request->get("tomonth")?>">
+<input type="hidden" name="today" value="<?=$request->get("today")?>">
+
+<input type="hidden" name="doDelete" value="doDelete">
+<input type="hidden" name="winMode" value="sub">
+</form>
+</body>
+</html>

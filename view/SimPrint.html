@@ -1,0 +1,406 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<script type="text/javascript" src="./common/common.js"></script>
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+<script type="text/javascript">
+<!--
+	function load() {
+		window.print();
+		window.close(); 
+	}
+
+-->
+</script>
+
+</head>
+<?php
+//ブラウザがIE6か判定
+if(ereg("MSIE 6.",$_SERVER['HTTP_USER_AGENT'])>0){
+	$iezoom = " style=\"zoom:0.8;\"";
+} else {
+	$iezoom = "";
+}
+?>
+<body onload="load();"<?=$iezoom?>>
+<table border=0 cellpadding="0" cellspacing="0" width="780px" align="center"><tr><td>
+			<div id="PrintArea">
+			
+			<form name="mainfrm" id="main" action="<?=$_SERVER['SCRIPT_NAME']?>#calculationresult" method="post">
+			<table border=0 cellpadding="0" cellspacing="0" width="100%">
+				<tr>
+					<td>
+						<br>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						お客様名：
+						<input type="text" name="cust_name" size="100" maxlength="100" onblur="check_cust_name(0);" value="<?=$session->get("cust_name")?>">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<br>
+					</td>
+				</tr>
+			</table>
+			<div id="simulationarea" style="display:<?php if($session->get("cust_name")!=""){print "";}else{print "none";} ?>;">
+			<table border=1 cellpadding="0" cellspacing="0" width="100%">
+				<tr>
+					<td>
+						<table width="100%" border="2" cellpadding="0" class="withline" cellspacing="1">
+							<tr>
+								<td width="49%" class="title" align="center">
+									使用機種
+								</td>
+								<td width="2%"></td>
+								<td width="49%" class="title" align="center">
+									提案機種
+								</td>
+							</tr>							
+							
+							<?php //for($i = 1; $i <= $controller->simulation_max_rows; $i++){ 
+								  for($i = 1; $i <= $request->get("hid_showline"); $i++){ ?>
+							<!-- <?=$i?>行目  -->
+							<tr>
+								<td width="49%" class="<?php if($i % 2 == 1){ ?>singlerow<?php }else{ ?>doublerow<?php } ?>">
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td align="right" width="30%">
+												省エネモード
+											</td>
+											<td>
+												<input type="radio" name="cur_ecomode<?=$i?>" value="1" id="cur_ecomodeon<?=$i?>" <?php if($request->get("cur_ecomode".$i)<>"0"){print("checked");} ?>>
+												<label for="cur_ecomodeon<?=$i?>">ON</label>
+												<input type="radio" name="cur_ecomode<?=$i?>" value="0" id="cur_ecomodeoff<?=$i?>" onclick="radiocheckctl(0,<?=$i?>);" <?php if($request->get("cur_ecomode".$i)=="0"){print("checked");} ?>>
+												<label for="cur_ecomodeoff<?=$i?>">Off</label>
+											</td>
+										</tr>
+									    <tr>
+											<td align="right" width="20%">
+												プラグ
+											</td>
+											<td>
+												<input type="radio" name="cur_plugmode<?=$i?>" value="1" id="cur_plugmodein<?=$i?>" <?php if($request->get("cur_plugmode".$i)<>"0"){print("checked");} ?>>
+												<label for="cur_plugmodein<?=$i?>">イン</label>
+												<input type="radio" name="cur_plugmode<?=$i?>" value="0" id="cur_plugmodeout<?=$i?>" onclick="radiocheckctl(0,<?=$i?>);" <?php if($request->get("cur_plugmode".$i)=="0"){print("checked");} ?>>
+												<label for="cur_plugmodeout<?=$i?>">アウト</label>
+											</td>
+										</tr>
+										<tr>
+											<td align="right" height="18px">
+												メーカー名
+											</td>
+											<td>
+												<select name="cur_maker_cd<?=$i?>" onchange="prodlistctl(0, <?=$i?>, '');">
+													<option value=""></option>
+													<?=common::createoptions($result->get("cur_makerlist"),"maker_cd","maker_name",$request->get("cur_maker_cd".$i))?>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												製品種別
+											</td>
+											<td>
+												<select name="cur_prod_type_cd<?=$i?>" onchange="prodlistctl(0, <?=$i?>, '');">
+													<option value=""></option>
+													<?=common::createoptions($result->get("both_prod_type_cd"),"prod_type_cd","prod_type_name",$request->get("cur_prod_type_cd".$i))?>
+												</select>
+												カラー/モノクロ
+												<select name="cur_color_kbn<?=$i?>" onchange="prodlistctl(0, <?=$i?>, '');">
+													<option value=""></option>
+													<option value="0" <?php if($request->get("cur_color_kbn".$i)=="0"){print "selected";} ?>>モノクロ</option>
+													<option value="1" <?php if($request->get("cur_color_kbn".$i)=="1"){print "selected";} ?>>カラー</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												機種
+											</td>
+											<td>
+												<select name="cur_seq_no<?=$i?>" class="printer" onchange="radiocheckctl(0, <?=$i?>);">
+													<option value=""><?=$result->get("cur_prod_name".$i)?></option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												台数
+											</td>
+											<td>
+												<input type="text" class="printers" name="cur_printers<?=$i?>" style="ime-mode: disabled;" maxlength="4" value="<?=$request->get("cur_printers".$i)?>">台
+												&nbsp;&nbsp;
+												ADV<input type="text" class="papers" name="cur_papers<?=$i?>" style="ime-mode: disabled;" maxlength="8" value="<?=$request->get("cur_papers".$i)?>">枚/月
+											</td>
+										</tr>
+									</table>
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td width="35%" align="right" class="result">
+												消費電力量：
+											</td>
+											<td class="result">
+												 <?=common::disp_encode($result->get("cur_yearpower".$i))?>&nbsp;kWh
+											</td>
+										</tr>
+										<tr>
+											<td align="right" class="result">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td class="result">
+												  <?=common::disp_encode($result->get("cur_yearco2".$i))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<td width="2%"></td>
+								<td width="49%" class="<?php if($i % 2 == 1){ ?>singlerow<?php }else{ ?>doublerow<?php } ?>">
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td align="right" width="30%">
+												省エネモード
+											</td>
+											<td>
+												<input type="radio" name="new_ecomode<?=$i?>" value="1" id="new_ecomodeon<?=$i?>" <?php if($request->get("new_ecomode".$i)<>"0"){print "checked";} ?>>
+												<label for="new_ecomodeon<?=$i?>">ON</label>
+												<input type="radio" name="new_ecomode<?=$i?>" value="0" id="new_ecomodeoff<?=$i?>" onclick="radiocheckctl(1,<?=$i?>);" <?php if($request->get("new_ecomode".$i)=="0"){print "checked";} ?>>
+												<label for="new_ecomodeoff<?=$i?>">Off</label>
+											</td>
+										</tr>
+									    <tr>
+											<td align="right" width="20%">
+												プラグ
+											</td>
+											<td>
+												<input type="radio" name="new_plugmode<?=$i?>" value="1" id="new_plugmodein<?=$i?>" <?php if($request->get("new_plugmode".$i)<>"0"){print "checked";} ?>>
+												<label for="new_plugmodein<?=$i?>">イン</label>
+
+												<input type="radio" name="new_plugmode<?=$i?>" value="0" id="new_plugmodeout<?=$i?>" onclick="radiocheckctl(1,<?=$i?>);" <?php if($request->get("new_plugmode".$i)=="0"){print "checked";} ?>>
+												<label for="new_plugmodeout<?=$i?>">アウト</label>
+												<input type="hidden" name="new_maker_cd<?=$i?>" value="<?=$controller->ricoh_maker_cd?>">
+											</td>
+										</tr>
+										<tr>
+											<td align="right" height="18px">
+												メーカー名
+											</td>
+											<td>
+												<select name="new_maker_cd<?=$i?>" onchange="prodlistctl(1, <?=$i?>, '');">
+													<option value=""></option>
+													<?=common::createoptions($result->get("cur_makerlist"),"maker_cd","maker_name",$request->get("new_maker_cd".$i))?>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												製品種別
+											</td>
+											<td>
+												<select name="new_prod_type_cd<?=$i?>" onchange="prodlistctl(1, <?=$i?>, '');">
+													<option value=""></option>
+													<?=common::createoptions($result->get("both_prod_type_cd"),"prod_type_cd","prod_type_name",$request->get("new_prod_type_cd".$i))?>
+												</select>
+												カラー/モノクロ
+												<select name="new_color_kbn<?=$i?>" onchange="prodlistctl(1, <?=$i?>, '');">
+													<option value=""></option>
+													<option value="0" <?php if($request->get("new_color_kbn".$i)=="0"){print "selected";} ?>>モノクロ</option>
+													<option value="1" <?php if($request->get("new_color_kbn".$i)=="1"){print "selected";} ?>>カラー</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												機種
+											</td>
+											<td>
+												<select name="new_seq_no<?=$i?>" class="printer" onchange="radiocheckctl(1, <?=$i?>);">
+													<option value=""><?=$result->get("new_prod_name".$i)?></option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												台数
+											</td>
+											<td>
+												<input type="text" class="printers" name="new_printers<?=$i?>" style="ime-mode: disabled;" maxlength="4" value="<?=$request->get("new_printers".$i)?>">台
+												&nbsp;&nbsp;
+												ADV<input type="text" class="papers" name="new_papers<?=$i?>" style="ime-mode: disabled;" maxlength="8" value="<?=$request->get("new_papers".$i)?>">枚/月
+											</td>
+										</tr>
+									</table>
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td width="35%" align="right" class="result">
+												消費電力量：
+											</td>
+											<td class="result">
+												 <?=common::disp_encode($result->get("new_yearpower".$i))?>&nbsp;kWh
+											</td>
+										</tr>
+										<tr>
+											<td align="right" class="result">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td class="result">
+												 <?=common::disp_encode($result->get("new_yearco2".$i))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+										</tr>
+									</table>
+
+								</td>
+							</tr>
+							<?php } ?>
+							
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<br>
+						シミュレーション年数：&nbsp;<?=$request->get("foryears")?>&nbsp;年
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table width="100%" border="0" cellpadding="1" class="withline" cellspacing="1">
+							<tr>
+								<td class="withline" width="49%">
+									<table width="100%" cellpadding="2" cellspacing="3" class="unit_total">
+
+										<tr>
+											<td colspan="2">
+												<b>使用機種　合計</b>
+											</td>
+										</tr>
+										<tr>
+											<td width="35%" align="right">
+												消費電力量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("cur_totalpower"))?>&nbsp;kWh
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												電気料金：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("cur_totalcost"))?>&nbsp;円
+											</td>
+										</tr>
+
+										<tr>
+											<td align="right">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("cur_totalco2"))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+
+										</tr>
+									</table>
+								</td>
+								<td width="2%"></td>
+								<td class="withline" width="49%">
+									<table width="100%" cellpadding="2" cellspacing="3" class="unit_total">
+										<tr>
+											<td colspan="2">
+												<b>提案機種　合計</b>
+											</td>
+										</tr>
+										<tr>
+											<td width="35%" align="right">
+												消費電力量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("new_totalpower"))?>&nbsp;kWh
+											</td>
+										</tr>
+
+										<tr>
+											<td align="right">
+												電気料金：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("new_totalcost"))?>&nbsp;円
+											</td>
+										</tr>
+										<tr>
+
+											<td align="right">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("new_totalco2"))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+										</tr>
+
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<table width="100%" cellpadding="1" cellspacing="3" class="sim_result">
+							<tr>
+								<td colspan="4">
+									&nbsp;&nbsp;<b>削減効果</b>
+								</td>
+							</tr>
+							<tr>
+								<td width="20%" align="right">
+									消費電力量：
+								</td>
+								<td width="30%">
+									<?=common::disp_encode($result->get("totalpower"))?>&nbsp;kWh
+								</td>
+
+								<td width="20%" align="right">
+									CO<sub>2</sub>削減量：
+								</td>
+								<td>
+									<?=common::disp_encode($result->get("totalco2"))?>&nbsp;kg-CO<sub>2</sub>
+								</td>
+							</tr>
+							<tr>
+								<td align="right">
+									電気料金：
+								</td>
+								<td>
+									<?=common::disp_encode($result->get("totalcost"))?>&nbsp;円
+								</td>
+								<td align="right">立木換算：</td>
+								<td>
+									<?=common::disp_encode($result->get("totaltrees"))?>&nbsp;本
+								</td>
+
+							</tr>
+							<tr>
+								<td colspan="4" align="center">
+									<textarea name="atention1" id="atention1" style="width:99%;height:50px" readonly><?=$result->get("simresultwarning")?></textarea>
+								</td>
+							</tr>
+							<?php if($result->get("suiteimsg") != ""){ ?>
+							<tr>
+								<td colspan="4" align="center">
+									<textarea name="atention2" id="atention2" style="width:99%;height:50px" readonly><?=$result->get("suiteimsg")?></textarea>	
+								</td>
+							</tr>
+							<?php } ?>
+						</table>
+					</td>
+				</tr>
+			</table>
+			</div>
+			</div>
+</td></tr></table>
+</body>
+</html>

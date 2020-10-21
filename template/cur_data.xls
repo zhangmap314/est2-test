@@ -1,0 +1,13 @@
+						<tr align="right">
+							<td><!--cur_no--></td>
+							<td><!--cur_color--></td>
+							<td><!--cur_prod_name--></td>
+							<td><!--cur_printers--></td>
+							<td><!--cur_papers--></td>
+							<td><!--cur_ecomode--></td>
+							<td><!--cur_plugmode--></td>
+							<td><!--cur_yearpower--></td>
+							<td><!--cur_yearcost--></td>
+							<td><!--cur_yearco2--></td>
+							<td><!--cur_yeartrees--></td>
+						</tr>

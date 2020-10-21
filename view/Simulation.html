@@ -1,0 +1,907 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<script type="text/javascript" src="./common/common.js"></script>
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+
+	<title>シミュレーション</title>
+	
+<script type="text/javascript">
+<!--
+	var prodlist = new Array();	<?php //機種区分、メーカー、製品種別、カラー区分ごとの機種リスト ?>
+	var offflg = new Array();	<?php //機種ごとの省エネoff可、プラグアウト可 ?>
+	
+	<?php
+		//機種リストを展開する
+		$i = 1;
+		while($result->get("prodlistname".$i, false)){
+	?>
+			prodlist["<?=$result->get("prodlistname".$i)?>"] = '<?=$result->get("prodlist".$i)?>';
+	<?php 	$i++;	 ?>
+	<?php } ?>
+	
+	<?php $offflglist = $result->get("offflglist"); //省エネoff可、プラグアウト可を展開する ?>
+	<?php for($i=0; $i<count($offflglist); $i++){ ?>
+		offflg["<?=$offflglist[$i]["seq_no"]?>"] = "<?=$offflglist[$i]["eco_off_flg"]."\t".$offflglist[$i]["plug_off_flg"]?>";
+	<?php } ?>
+	
+	
+	//Trim関数の作成
+	String.prototype.trim = function() {
+    	return this.replace(/^[ ]+|[　]+$/g, '');
+	}
+	
+	<?php
+	/*
+	プラグモード、省エネモードラジオ制御
+	kbn
+		0:カレント機種；1:提案機種
+	rowno
+		行番号
+	*/
+	?>
+	function radiocheckctl(kbn, rowno){
+		if(kbn == 1){//新機種
+			if(document.mainfrm.elements["new_seq_no" + rowno].selectedIndex >= 0){
+				if(offflg[document.mainfrm.elements["new_seq_no" + rowno].value].split("\t")[0] == "0"){
+					//省エネ不可
+					document.mainfrm.elements["new_ecomode" + rowno][0].checked = true;
+				}
+				if(offflg[document.mainfrm.elements["new_seq_no" + rowno].value].split("\t")[1] == "0"){
+					//プラグアウト不可
+					document.mainfrm.elements["new_plugmode" + rowno][0].checked = true;
+				}
+			}
+			/*
+			if(document.mainfrm.elements["new_plugmode" + rowno][1].checked){	//プラグアウトの場合は省エネoffは不可
+				document.mainfrm.elements["new_ecomode" + rowno][0].checked = true;
+			}
+			*/
+		}else{//カレント機種
+			if(document.mainfrm.elements["cur_seq_no" + rowno].selectedIndex >= 0){
+				if(offflg[document.mainfrm.elements["cur_seq_no" + rowno].value].split("\t")[0] == "0"){
+					//省エネ不可
+					document.mainfrm.elements["cur_ecomode" + rowno][0].checked = true;
+				}
+				if(offflg[document.mainfrm.elements["cur_seq_no" + rowno].value].split("\t")[1] == "0"){
+					//プラグアウト不可
+					document.mainfrm.elements["cur_plugmode" + rowno][0].checked = true;
+				}
+			}
+			/*
+			if(document.mainfrm.elements["cur_plugmode" + rowno][1].checked){	//プラグアウトの場合は省エネoffは不可
+				document.mainfrm.elements["cur_ecomode" + rowno][0].checked = true;
+			}
+			*/
+		}
+	}
+	
+	var msg;
+	msg = "<?=$result->get("telopmsg")?>";
+	function telop() {
+		setTimeout("telop()",500);
+		msg=msg.substring(2,msg.length)+msg.substring(0,2);
+		document.telop.telop.value=msg;
+		//window.status=msg;
+	}
+	
+	<?php
+	/*
+	選択情報を基に機種リストを作成する
+	kbn
+		0:カレント機種；1:提案機種
+	rowno
+		行番号
+	def
+		初期選択値
+	*/
+	?>
+	function prodlistctl(kbn, rowno, def){
+		var listobj = null;
+		var maker_cd = "";
+		var prod_type_cd = "";
+		var color_kbn = "";
+		var prodar = new Array();
+		
+		var ricoh_maker_cd = "<?=$controller->ricoh_maker_cd?>";
+		
+		if(kbn == 1){//新機種
+			//maker_cd = document.mainfrm.elements["new_maker_cd" + rowno].value;
+			listobj = document.mainfrm.elements["new_maker_cd" + rowno];
+			maker_cd = listobj[listobj.selectedIndex].value;
+			
+			//リコー機以外の場合は省エネラジオをグレーダウン
+			if(maker_cd != ricoh_maker_cd){
+				document.mainfrm.elements["new_ecomode" + rowno][0].checked = true;
+				document.mainfrm.elements["new_ecomode" + rowno][0].disabled = true;
+				document.mainfrm.elements["new_ecomode" + rowno][1].disabled = true;
+			}else{
+				document.mainfrm.elements["new_ecomode" + rowno][0].disabled = false;
+				document.mainfrm.elements["new_ecomode" + rowno][1].disabled = false;
+			}
+			
+			listobj = document.mainfrm.elements["new_prod_type_cd" + rowno];
+			prod_type_cd = listobj[listobj.selectedIndex].value;
+			
+			listobj = document.mainfrm.elements["new_color_kbn" + rowno];
+			color_kbn = listobj[listobj.selectedIndex].value;
+			
+			listobj = document.mainfrm.elements["new_seq_no" + rowno];
+			
+		}else if(kbn == 0){//カレント機種
+			listobj = document.mainfrm.elements["cur_maker_cd" + rowno];
+			maker_cd = listobj[listobj.selectedIndex].value;
+			
+			//リコー機以外の場合は省エネラジオをグレーダウン
+			if(maker_cd != ricoh_maker_cd){
+				document.mainfrm.elements["cur_ecomode" + rowno][0].checked = true;
+				document.mainfrm.elements["cur_ecomode" + rowno][0].disabled = true;
+				document.mainfrm.elements["cur_ecomode" + rowno][1].disabled = true;
+			}else{
+				document.mainfrm.elements["cur_ecomode" + rowno][0].disabled = false;
+				document.mainfrm.elements["cur_ecomode" + rowno][1].disabled = false;
+			}
+			
+			listobj = document.mainfrm.elements["cur_prod_type_cd" + rowno];
+			prod_type_cd = listobj[listobj.selectedIndex].value;
+
+			listobj = document.mainfrm.elements["cur_color_kbn" + rowno];
+			color_kbn = listobj[listobj.selectedIndex].value;
+
+			listobj = document.mainfrm.elements["cur_seq_no" + rowno];
+		}
+		
+		//機種リストをクリア
+		while(listobj.length > 0){
+			listobj[0] = null;
+		}
+		
+		if(maker_cd != "" && prod_type_cd != "" && color_kbn != ""){<?php //メーカ、製品種別、カラー区分が全て選択されている ?>
+			if(prodlist["index" + maker_cd + prod_type_cd + color_kbn + kbn] == "undefined" || 
+				prodlist["index" + maker_cd + prod_type_cd + color_kbn + kbn] == null){
+				<?php //機種情報がなければ、処理を中止 ?>
+				return;
+			}
+			prodar = prodlist["index" + maker_cd + prod_type_cd + color_kbn + kbn].split("\t");
+			
+			for(i = 0; i < prodar.length; i+=2){
+				listobj.options[listobj.length] = new Option(prodar[i+1], prodar[i]);
+			}
+			if(def != ""){
+				listobj.value = def;
+			}
+			<?php //機種プルダウン生成後にラジオチェックを確認 ?>
+			radiocheckctl(kbn, rowno);
+		}
+		
+	}
+	
+	//お客様名入力チェック
+    function check_cust_name(bybutton){
+	    document.mainfrm.cust_name.value = document.mainfrm.cust_name.value.trim();
+		  
+		if(document.mainfrm.calculate1 == null || document.mainfrm.calculate1 == "undefined")
+		{
+	    	if(bybutton == 0){//lostfocus時
+	    		return false;
+		    }
+		    
+		    //ボタンクリック時
+		    if(document.mainfrm.cust_name.value.length <= 0){
+    			alert("お客様名を入力して下さい。");
+	    		document.mainfrm.cust_name.focus();
+				return false;
+	   		}else if(document.mainfrm.cust_name.value.length > 100){
+	   			alert("お客様名の桁数がオーバーしています。");
+	    		document.mainfrm.cust_name.focus();
+				return false;
+	   		}
+			
+		  	document.mainfrm.defaultposition.value = "";
+			document.mainfrm.hid_showline.value = document.mainfrm.show_line.value;
+			
+			//document.getElementById('simulationarea').style.display = "";
+	   		//document.getElementById('actionbuttons').style.display = "";
+	    }else{//シミュレーションエリアが表示されている場合
+	    	if(bybutton == 1){
+	    		return false;
+	    	}
+	    	if(document.mainfrm.cust_name.value.length <= 0){
+	    		alert("お客様名を入力して下さい。");
+	    		document.mainfrm.cust_name.focus();
+				return false;
+	   		}else if(document.mainfrm.cust_name.value.length > 100){
+	   			alert("お客様名の桁数がオーバーしています。");
+	    		document.mainfrm.cust_name.focus();
+				return false;
+	   		}
+	    }
+		
+		return true;
+		
+    }
+
+
+	function printdoc(argID) {
+		var newwin;
+		newwin = window.open("","subwin");
+		
+		var submittarget = document.mainfrm.target;
+		
+		document.mainfrm.printout.value = "printout";
+		document.mainfrm.target = "subwin";
+		document.mainfrm.submit();
+		
+		document.mainfrm.printout.value = "";
+		document.mainfrm.target = submittarget;
+		
+		//newwin.print();
+		//newwin.close();
+	}
+	
+	function calc(btnIdx){
+		//｢次へ｣ボタンのサブミット化に伴い条件式を変更(入れ替え)
+		/*if(btnIdx == 1){//上の計算ボタン押下
+			 document.mainfrm.foryears.value = document.mainfrm.foryears1.value;
+			 document.mainfrm.defaultposition.value = "";
+		}else{//下の計算ボタン押下
+			 document.mainfrm.foryears.value = document.mainfrm.foryears2.value;
+			 document.mainfrm.defaultposition.value = "calculationresult";
+		}*/
+		
+		if(btnIdx == 2){//下の計算ボタン押下
+			 document.mainfrm.foryears.value = document.mainfrm.foryears2.value;
+			 document.mainfrm.defaultposition.value = "calculationresult";
+		}else{//上の計算ボタン押下
+			 document.mainfrm.foryears.value = document.mainfrm.foryears1.value;
+			 document.mainfrm.defaultposition.value = "";
+		}
+		
+		document.mainfrm.calculate.value = "計算";
+		document.mainfrm.submit();
+		
+		document.mainfrm.calculate.value = "";
+	}
+	
+	function copySimDataToClipboard(){
+		var dat = '<?=$result->get("clipboardData")?>';
+		
+		clipboardData.setData("Text", dat);
+		
+		if(dat != ''){
+			alert('クリップボードにコピーしました。');
+		}
+	}
+	
+-->
+</script>
+
+
+</head>
+<body onload="telop();<?php if( $result->get("err") != ""){ ?>alert('入力エラーがありました。ご確認してから再度「計算」ボタンを押して下さい。');<?php } ?>">
+<form name="headfrm" action="Menu.php" method="post">
+<table width="100%" class="header">
+	<tr>
+		<td>
+			<img src="./common/ghdr-logo.gif" width="100" height="30" alt="logo" border="0" align="left">
+		</td>
+		<td align="left" nowrap>
+			<font class="PageTitle">シミュレーション</font>
+		</td>
+		<td width="100" nowrap>
+			<?php if($session->get("user_lebel") == USER_LEBEL_ADMIN || $session->get("user_lebel") == USER_LEBEL_LOGGER){ ?>
+			<input type="submit" class="CloseButton" name="tomenu" value="メニューへ戻る">
+			<?php } ?>
+			<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+			<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+		</td>
+		<td width="120" nowrap>
+			<input type="button" class="CloseButton" name="logadmin" value="　閉じる　" onclick="window.close();">
+		</td>
+	</tr>
+
+</table>
+</form>
+
+<br>
+
+<table border=0 cellpadding="0" cellspacing="0" width="750px" align="center">
+	<tr>
+		<td>
+			<table width="100%" border="0">
+				<form name="telop">
+				<tr>
+					<td colspan="4">
+						<input type="text" name="telop" readonly class="telop"><br><br>
+					</td>
+				</tr>
+				</form>
+				<tr>
+					<td width="25%">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</td>
+					<form name="ecoinfofrm" action="EcoInfoMnt2.php" target="_blank" method="POST">
+					<td align="right" valign="top">
+						<input type="submit" class="button_on_sim" name="ecoinfo" value="換算係数">
+						<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+						<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					</td>
+					</form>
+					<form name="helpfrm" action="Help.php" target="_blank" method="POST">
+					<td align="right" valign="top">
+						<input type="submit" class="button_on_sim" name="downloadhowto" value="ご利用にあたって">
+						<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+						<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					</td>
+					<td align="right" valign="top">
+						<input type="submit" class="button_on_sim" name="downloadmanual" value="操作方法">
+					</td>
+					</form>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table border="0" width="100%" cellspacing="0">
+				<tr>
+					<td class="error">
+					<?=$result->get("err")?>
+					</td>
+				</tr>
+			</tabel>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div id="PrintArea">
+			
+			<form name="mainfrm" id="main" action="<?=$_SERVER['SCRIPT_NAME']?>#calculationresult" method="post">
+			<table border=0 cellpadding="0" cellspacing="0" width="100%">
+				<tr>
+					<td>
+						<br>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						機種行数：
+						<select name="show_line" <?php if($request->get("hid_showline")!=""){print " disabled='true' ";} ?> >
+						<!-- <select name="hid_showline"> -->
+							<?php for ($i = 4; $i <= $controller->simulation_max_rows; $i++){ ?>
+								<option value="<?=$i ?>" <?php if($request->get("hid_showline")==$i){print "selected";} ?> ><?=$i ?></option>
+							<?php } ?>
+						</select>
+						<br>
+						お客様名：
+						<input type="text" name="cust_name" size="100" maxlength="100" onblur="check_cust_name(0);" value="<?=$session->get("cust_name")?>">
+					
+					<!--	<input type="button" class="button" name="tonext" value="次へ" onclick="check_cust_name(1);"> -->
+					<input type="submit" class="button" name="tonext" value="次へ" onclick="return check_cust_name(1);" >
+					<input type="hidden" name="hid_showline" value="<?=$request->get("hid_showline") ?>">
+					<input type="hidden" name="defaultposition" value="calculationresult">
+
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<br>
+					</td>
+				</tr>
+			</table>
+			<?php if($session->get("cust_name")!="" && $request->get("hid_showline") != "") { ?>
+<!--		<div id="simulationarea" style="display:<?php /* if($session->get("cust_name")!="" && $request->get("hid_showline") != ""){print "";}else{print "none";} */ ?>;">  -->
+			<div>
+			<table border="1" cellpadding="0" cellspacing="0" width="100%">
+				<tr>
+					<td align="right">
+						シミュレーション年数：
+						<select name="foryears1" style="width: 30pt;">
+							<option value="1" <?php if($request->get("foryears")=="1"){print "selected";} ?>>1</option>
+							<option value="2" <?php if($request->get("foryears")=="2"){print "selected";} ?>>2</option>
+							<option value="3" <?php if($request->get("foryears")=="3"){print "selected";} ?>>3</option>
+							<option value="4" <?php if($request->get("foryears")=="4"){print "selected";} ?>>4</option>
+							<option value="5" <?php if($request->get("foryears")=="5"){print "selected";} ?>>5</option>
+						</select>年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="button" class="button" name="calculate1" value="  計 算  " onclick="calc(1);">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						
+						<table width="100%" border="2" cellpadding="0" class="withline" cellspacing="1">
+							<tr>
+								<td width="49%" class="title" align="center">
+									使用機種
+								</td>
+								<td width="2%"></td>
+								<td width="49%" class="title" align="center">
+									提案機種
+								</td>
+							</tr>							
+							
+							<?php //for($i = 1; $i <= $controller->simulation_max_rows; $i++){ 
+								for ($i = 1; $i <= $request->get("hid_showline"); $i++){ ?>
+							<!-- <?=$i?>行目  -->
+							<tr>
+								<td width="49%" class="<?php if($i % 2 == 1){ ?>singlerow<?php }else{ ?>doublerow<?php } ?>">
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td align="right" width="30%">
+												<b><?=$i?></b>&nbsp;省エネモード
+											</td>
+											<td>
+												<input type="radio" name="cur_ecomode<?=$i?>" value="1" id="cur_ecomodeon<?=$i?>" <?php if($request->get("cur_ecomode".$i)<>"0"){print("checked");} ?>>
+												<label for="cur_ecomodeon<?=$i?>">あり</label>
+												<input type="radio" name="cur_ecomode<?=$i?>" value="0" id="cur_ecomodeoff<?=$i?>" onclick="radiocheckctl(0,<?=$i?>);" <?php if($request->get("cur_ecomode".$i)=="0"){print("checked");} ?>>
+												<label for="cur_ecomodeoff<?=$i?>">なし</label>
+											</td>
+										</tr>
+									    <tr>
+											<td align="right" width="20%">
+												主電源
+											</td>
+											<td>
+												<input type="radio" name="cur_plugmode<?=$i?>" value="1" id="cur_plugmodein<?=$i?>" <?php if($request->get("cur_plugmode".$i)<>"0"){print("checked");} ?>>
+												<label for="cur_plugmodein<?=$i?>">ON</label>
+												<input type="radio" name="cur_plugmode<?=$i?>" value="0" id="cur_plugmodeout<?=$i?>" onclick="radiocheckctl(0,<?=$i?>);" <?php if($request->get("cur_plugmode".$i)=="0"){print("checked");} ?>>
+												<label for="cur_plugmodeout<?=$i?>">OFF</label>
+											</td>
+										</tr>
+										<tr>
+											<td align="right" height="18px">
+												メーカー名
+											</td>
+											<td>
+												<select name="cur_maker_cd<?=$i?>" onchange="prodlistctl(0, <?=$i?>, '');">
+													<option value=""></option>
+													<?=common::createoptions($result->get("cur_makerlist"),"maker_cd","maker_name",$request->get("cur_maker_cd".$i))?>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												製品種別
+											</td>
+											<td>
+												<select name="cur_prod_type_cd<?=$i?>" onchange="prodlistctl(0, <?=$i?>, '');">
+													<option value=""></option>
+													<?=common::createoptions($result->get("both_prod_type_cd"),"prod_type_cd","prod_type_name",$request->get("cur_prod_type_cd".$i))?>
+												</select>
+												カラー/モノクロ
+												<select name="cur_color_kbn<?=$i?>" onchange="prodlistctl(0, <?=$i?>, '');">
+													<option value=""></option>
+													<option value="0" <?php if($request->get("cur_color_kbn".$i)=="0"){print "selected";} ?>>モノクロ</option>
+													<option value="1" <?php if($request->get("cur_color_kbn".$i)=="1"){print "selected";} ?>>カラー</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												機種
+											</td>
+											<td>
+												<select name="cur_seq_no<?=$i?>" class="printer" onchange="radiocheckctl(0, <?=$i?>);">
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												台数
+											</td>
+											<td>
+												<input type="text" class="printers" name="cur_printers<?=$i?>" style="ime-mode: disabled;" maxlength="4" value="<?=$request->get("cur_printers".$i)?>">台
+												&nbsp;ADV
+												<input type="text" class="papers" name="cur_papers<?=$i?>" style="ime-mode: disabled;" maxlength="8" value="<?=$request->get("cur_papers".$i)?>">
+												枚/月/台
+											</td>
+										</tr>
+									</table>
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td width="35%" align="right" class="result">
+												消費電力量：
+											</td>
+											<td class="result">
+												 <?=common::disp_encode($result->get("cur_yearpower".$i))?>&nbsp;kWh
+											</td>
+										</tr>
+										<tr>
+											<td align="right" class="result">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td class="result">
+												  <?=common::disp_encode($result->get("cur_yearco2".$i))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<td width="2%"></td>
+								<td width="49%" class="<?php if($i % 2 == 1){ ?>singlerow<?php }else{ ?>doublerow<?php } ?>">
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td align="right" width="30%">
+												<b><?=$i?></b>&nbsp;省エネモード
+											</td>
+											<td>
+												<input type="radio" name="new_ecomode<?=$i?>" value="1" id="new_ecomodeon<?=$i?>" <?php if($request->get("new_ecomode".$i)<>"0"){print "checked";} ?>>
+												<label for="new_ecomodeon<?=$i?>">あり</label>
+												<input type="radio" name="new_ecomode<?=$i?>" value="0" id="new_ecomodeoff<?=$i?>" onclick="radiocheckctl(1,<?=$i?>);" <?php if($request->get("new_ecomode".$i)=="0"){print "checked";} ?>>
+												<label for="new_ecomodeoff<?=$i?>">なし</label>
+											</td>
+										</tr>
+									    <tr>
+											<td align="right" width="20%">
+												主電源
+											</td>
+											<td>
+												<input type="radio" name="new_plugmode<?=$i?>" value="1" id="new_plugmodein<?=$i?>" <?php if($request->get("new_plugmode".$i)<>"0"){print "checked";} ?>>
+												<label for="new_plugmodein<?=$i?>">ON</label>
+
+												<input type="radio" name="new_plugmode<?=$i?>" value="0" id="new_plugmodeout<?=$i?>" onclick="radiocheckctl(1,<?=$i?>);" <?php if($request->get("new_plugmode".$i)=="0"){print "checked";} ?>>
+												<label for="new_plugmodeout<?=$i?>">OFF</label>
+												<!--<input type="hidden" name="new_maker_cd<?=$i?>" value="<?=$controller->ricoh_maker_cd?>">-->
+											</td>
+										</tr>
+										<tr>
+											<td height="18px" align="right">メーカー名</td>
+											<td>
+												<select name="new_maker_cd<?=$i?>" onchange="prodlistctl(1, <?=$i?>, '');">
+													<option value=""></option>
+													<?php //2012/9/15 改修。メーカーコードの元データは同じであるため、 cur_makerlistと共用?>
+													<?=common::createoptions($result->get("cur_makerlist"),"maker_cd","maker_name",$request->get("new_maker_cd".$i))?>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												製品種別
+											</td>
+											<td>
+												<select name="new_prod_type_cd<?=$i?>" onchange="prodlistctl(1, <?=$i?>, '');">
+													<option value=""></option>
+													<?=common::createoptions($result->get("both_prod_type_cd"),"prod_type_cd","prod_type_name",$request->get("new_prod_type_cd".$i))?>
+												</select>
+												カラー/モノクロ
+												<select name="new_color_kbn<?=$i?>" onchange="prodlistctl(1, <?=$i?>, '');">
+													<option value=""></option>
+													<option value="0" <?php if($request->get("new_color_kbn".$i)=="0"){print "selected";} ?>>モノクロ</option>
+													<option value="1" <?php if($request->get("new_color_kbn".$i)=="1"){print "selected";} ?>>カラー</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												機種
+											</td>
+											<td>
+												<select name="new_seq_no<?=$i?>" class="printer" onchange="radiocheckctl(1, <?=$i?>);">
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												台数
+											</td>
+											<td>
+												<input type="text" class="printers" name="new_printers<?=$i?>" style="ime-mode: disabled;" maxlength="4" value="<?=$request->get("new_printers".$i)?>">台
+												&nbsp;ADV
+												<input type="text" class="papers" name="new_papers<?=$i?>" style="ime-mode: disabled;" maxlength="8" value="<?=$request->get("new_papers".$i)?>">
+												枚/月/台
+											</td>
+										</tr>
+									</table>
+									<table width="100%" border="0" cellpadding="1" cellspacing="0">
+										<tr>
+											<td width="35%" align="right" class="result">
+												消費電力量：
+											</td>
+											<td class="result">
+												 <?=common::disp_encode($result->get("new_yearpower".$i))?>&nbsp;kWh
+											</td>
+										</tr>
+										<tr>
+											<td align="right" class="result">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td class="result">
+												 <?=common::disp_encode($result->get("new_yearco2".$i))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+										</tr>
+									</table>
+
+								</td>
+							</tr>
+							<?php } ?>
+							
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<br>
+						<a name="<?=$request->get("defaultposition")?>"></a>
+						シミュレーション年数：
+						<select name="foryears2" style="width: 30pt;">
+							<option value="1" <?php if($request->get("foryears")=="1"){print "selected";} ?>>1</option>
+							<option value="2" <?php if($request->get("foryears")=="2"){print "selected";} ?>>2</option>
+							<option value="3" <?php if($request->get("foryears")=="3"){print "selected";} ?>>3</option>
+							<option value="4" <?php if($request->get("foryears")=="4"){print "selected";} ?>>4</option>
+							<option value="5" <?php if($request->get("foryears")=="5"){print "selected";} ?>>5</option>
+						</select>年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="button" class="button" name="calculate2" value="  計 算  " onclick="calc(2);">
+
+						<?php
+						$foryears = $request->get("foryears");
+						if($foryears == ""){
+							$foryears = "1";
+						}
+						?>
+						<input type="hidden" name="foryears" value="<?=$foryears?>">
+						<input type="hidden" name="calculate" value="">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<table width="100%" border="0" cellpadding="1" class="withline" cellspacing="1">
+							<tr>
+								<td class="withline" width="49%">
+									<table width="100%" cellpadding="2" cellspacing="3" class="unit_total">
+
+										<tr>
+											<td colspan="2">
+												<b>使用機種　合計</b>
+											</td>
+										</tr>
+										<tr>
+											<td width="35%" align="right">
+												消費電力量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("cur_totalpower"))?>&nbsp;kWh
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												電気料金：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("cur_totalcost"))?>&nbsp;円
+											</td>
+										</tr>
+
+										<tr>
+											<td align="right">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("cur_totalco2"))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+
+										</tr>
+									</table>
+								</td>
+								<td width="2%"></td>
+								<td class="withline" width="49%">
+									<table width="100%" cellpadding="2" cellspacing="3" class="unit_total">
+										<tr>
+											<td colspan="2">
+												<b>提案機種　合計</b>
+											</td>
+										</tr>
+										<tr>
+											<td width="35%" align="right">
+												消費電力量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("new_totalpower"))?>&nbsp;kWh
+											</td>
+										</tr>
+
+										<tr>
+											<td align="right">
+												電気料金：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("new_totalcost"))?>&nbsp;円
+											</td>
+										</tr>
+										<tr>
+											<td align="right">
+												CO<sub>2</sub>排出量：
+											</td>
+											<td>
+												 <?=common::disp_encode($result->get("new_totalco2"))?>&nbsp;kg-CO<sub>2</sub>
+											</td>
+										</tr>
+
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<table width="100%" cellpadding="1" cellspacing="3" class="sim_result">
+							<tr>
+								<td colspan="4">
+									&nbsp;&nbsp;<b>削減効果</b>
+									&nbsp;&nbsp;&nbsp;
+									<font color="green" size="2">
+										数値が赤字の場合、提案機種の方が増加することになります。
+									</font>
+								</td>
+							</tr>
+							<tr>
+								<td width="20%" align="right">
+									消費電力量：
+								</td>
+								<td width="30%">
+									<?php if(mb_substr($result->get("totalpower"), 0 ,1) == "-"){ ?>
+									<font color="red">
+									<?php } ?>
+									<?=common::disp_encode($result->get("totalpower"))?>
+									<?php if(mb_substr($result->get("totalpower"), 0 ,1) == "-"){ ?>
+									</font>
+									<?php } ?>
+									&nbsp;kWh
+								</td>
+
+								<td width="20%" align="right">
+									CO<sub>2</sub>削減量：
+								</td>
+								<td>
+									<?php if(mb_substr($result->get("totalco2"), 0 ,1) == "-"){ ?>
+									<font color="red">
+									<?php } ?>
+									<?=common::disp_encode($result->get("totalco2"))?>
+									<?php if(mb_substr($result->get("totalco2"), 0 ,1) == "-"){ ?>
+									</font>
+									<?php } ?>
+									&nbsp;kg-CO<sub>2</sub>
+								</td>
+							</tr>
+							<tr>
+								<td align="right">
+									電気料金：
+								</td>
+								<td>
+									<?php if(mb_substr($result->get("totalcost"), 0 ,1) == "-"){ ?>
+									<font color="red">
+									<?php } ?>
+									<?=common::disp_encode($result->get("totalcost"))?>
+									<?php if(mb_substr($result->get("totalcost"), 0 ,1) == "-"){ ?>
+									</font>
+									<?php } ?>
+									&nbsp;円
+								</td>
+								<td align="right">立木換算：</td>
+								<td>
+									<?php if(mb_substr($result->get("totaltrees"), 0 ,1) == "-"){ ?>
+									<font color="red">
+									<?php } ?>
+									<?=common::disp_encode($result->get("totaltrees"))?>
+									<?php if(mb_substr($result->get("totaltrees"), 0 ,1) == "-"){ ?>
+									</font>
+									<?php } ?>
+									&nbsp;本
+								</td>
+
+							</tr>
+							<?php if($request->get("action") == "calculate"){ ?>
+							<tr>
+								<td colspan="4" align="center">
+									<textarea name="atention1" id="atention1" style="width:99%;height:50px" readonly><?=$result->get("simresultwarning")?></textarea>
+								</td>
+							</tr>
+							<?php if($result->get("suiteimsg") != ""){ ?>
+							<tr>
+								<td colspan="4" align="center">
+									<textarea name="atention2" id="atention2" style="width:99%;height:50px" readonly><?=$result->get("suiteimsg")?></textarea>	
+								</td>
+							</tr>
+							<?php } ?>
+							<?php } ?>
+						</table>
+					</td>
+				</tr>
+			</table>
+			</div>
+			</div>
+<!--		<div id="actionbuttons" style="display: <?php /* if($session->get("cust_name")!="" && $request->get("hid_showline") != ""){print "block";}else{print "none";} */ ?>;"> -->
+			<div>
+			<br>
+			<table width="100%">
+					<td align="right" valign="top" width="40%">
+						<input type="submit" class="button" name="clearall" value="全クリア">&nbsp;
+						<input type="button" class="button" name="doprintout" value="画面印刷" onclick="printdoc();">
+						
+						<input type="hidden" name="printout" value="">
+						<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+						<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+						&nbsp;&nbsp;
+					</td>
+					<td>
+						<table class="withline" cellpadding="2" width="100%">
+							<tr>
+								<td class="withline" align="center">
+									シミュレーション結果をダウンロード
+								</td>
+							</tr>
+							<tr>
+								<td class="withline" align="right">
+									<input type="submit" class="button" name="download" value="エクセルファイル">
+									&nbsp;
+									<input type="submit" class="button" name="dlformacro" value="提案書用テンプレートデータ">
+								</td>
+							</tr>
+							
+							<?php
+							if( mb_strlen($session->get("caller")) == 2 && is_numeric($session->get("caller")) ){
+								//クリップボードへのコピーボタン表示制御
+								if( $session->get("caller") >= 20 && $session->get("caller") <= 29 ){
+							?>
+							<tr>
+								<td class="withline" align="right">
+									<input type="button" name="doCopy" id="doCopy" value="クイックレポート用データ" onclick="copySimDataToClipboard();">
+								</td>
+							</tr>
+							
+							<?php }} ?>
+							
+						</table>
+					</td>
+				</tr>
+			</table>
+			</div>
+			<?php } ?>		
+			</form>
+			<br>
+		</td>
+	</tr>
+	
+</table>
+		<table width="100%" border="0">
+			<form name="helpfrm" action="Help.php" method="POST">
+					<tr>
+						<td align="right" valign="top" colspan="4">
+							<table class="withline" cellpadding="2">
+								<tr>
+									<td align="center" class="withline">
+												提案書テンプレート
+										</td>
+										</tr>
+								<tr>
+									<td class="withline">
+									<select name="ideafile" class="sel_temp">
+									<?=common::createoptions($result->get("filelist"),"filename","dispname",$request->get("ideafile"))?>
+							        </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<input type="submit" class="button" name="downloadidea" value="ダウンロード" <?php if(count($result->get("filelist")) == 0){ ?>disabled<?php } ?>>
+									<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+									<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+								</td>
+							</tr>
+						</table>
+					</td>	
+				</tr>
+			</form>
+		</table>
+
+<script language="javascript">
+<!--
+<?php for($i=1; $i <= $request->get("hid_showline"); $i++){ ?>
+prodlistctl(0, <?=$i?>, '<?=$request->get("cur_seq_no".$i)?>');
+prodlistctl(1, <?=$i?>, '<?=$request->get("new_seq_no".$i)?>');
+<?php } ?>
+
+ -->
+</script>
+</body>
+</html>
+

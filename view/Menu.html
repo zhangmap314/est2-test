@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<script type="text/javascript" src="./common/common.js"></script>
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<noscript>
+	<META HTTP-EQUIV=Refresh CONTENT="0; URL=./noscript.html">
+	</noscript>
+	<title>メニュー</title>
+	
+
+<script type="text/javascript">
+<!--
+function openwindow(KBN){
+	switch(KBN){
+	case 1:
+	//	window.open("","subwin","dependent=yes,location=no,menubar=no,resizable=no,status=yes,toolbar=no,scrollbars=yes,width=700,height=350");
+		window.open("","subwin","scrollbars=yes,width=600,height=330");
+		document.forms["frm1"].action="LogWarning.php";
+		document.forms["frm1"].target="subwin";
+		document.forms["frm1"].submit();
+		break;
+	//case 2:
+	//	window.open("EcoInfoMnt.html","_self","status=no,toolbar=no,");
+	//	break;
+	//case 4:
+	//	window.open("ProductList.html","_self","status=no,toolbar=no,");
+	//	break;
+	//case 5:
+	//	window.open("UserMnt.html","_self","status=no,toolbar=no,");
+	//	break;
+	//case 6:
+	//	window.open("","subwin","dependent=yes,location=no,menubar=no,resizable=no,status=yes,toolbar=no,scrollbars=yes,width=800,height=600");
+	//	document.forms["frm6"].action="Upload.php";
+	//	document.forms["frm6"].target="subwin";
+	//	document.forms["frm6"].submit();
+	//	break;
+	}
+}
+// -->
+</script>
+
+</head>
+<body>
+	<table width="100%"  class="header">
+		<tr>
+			<td>
+				<img src="./common/ghdr-logo.gif" width="100" height="30" alt="logo" border="0" align="left">
+			</td>
+			<td align="left" nowrap>
+				<font class="PageTitle">メニュー</font>
+			</td>
+			<td width="120" nowrap>
+				<input type="button" class="CloseButton" name="Close" value="　閉じる　" onclick="window.close();">
+			</td>
+		</tr>
+	</table>
+
+	<br>
+
+	<table border="0" align="center" width="80%">
+		<tr>
+			<td nowrap>
+				<form name="frm1" method="post">
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input class="MenuButton" type="button" name="logmnt" value="       ロ グ 管 理       " onclick="openwindow(1);">
+				</form>
+			</td>
+			<td nowrap>
+				<form name="frm3" action="SimWarning.php" method=post>
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input class="MenuButton" type="submit" name="simulation" value="  　シミュレーション  　" >
+				</form>
+			</td>
+			<td nowrap>
+				<form name="frm2" action="EcoInfoMnt.php" method=post>
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input class="MenuButton" type="submit" name="ecoinfomnt" value="環境情報メンテナンス" <?= $result->get("Disabled"); ?>>
+				</form>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3"></td>
+		</tr>
+		<tr>
+			<td nowrap>
+				<form name="frm4" action="ProductList.php" method=post>
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input class="MenuButton" type="submit" name="productmnt" value="　　機種メンテナンス　" <?= $result->get("Disabled"); ?>>
+				</form>
+			</td>
+			<td nowrap>
+				<form name="frm5" action="UserMnt.php" method=post>
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input class="MenuButton" type="submit" name="usermnt" value="  管理者メンテナンス " <?= $result->get("Disabled"); ?>>
+				</form>
+			</td>
+			<td nowrap>
+				<form name="frm6" action="Upload.php"  method="post">
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input class="MenuButton" type="submit" name="fileupload" value="ファイルアップロード" <?=$result->get("Disabled"); ?>>
+				</form>
+		</td>
+		</tr>
+		<tr>
+			<td colspan="3"></td>
+		</tr>
+		<tr>
+			<td nowrap>
+				<form name="frm7" action="CalledFromMnt.php" method="post">
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input class="MenuButton" type="submit" name="callerMnt" value="呼出し元管理" <?=$result->get("Disabled") ?>>
+				</form>
+			</td>
+			<td colspan="2"></td>
+		</tr>
+	</table>
+</body>
+</html>

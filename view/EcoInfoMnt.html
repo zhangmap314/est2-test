@@ -1,0 +1,294 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<title>環境情報メンテナンス</title>
+<noscript>
+<META HTTP-EQUIV=Refresh CONTENT="0; URL=./noscript.html">
+</noscript>
+<script type="text/javascript" src="./common/common.js"></script>
+<script type="text/javascript">
+	<?php $alert = $result->get("Delete_alert",false); ?>
+	<!--
+		//削除ボタンのアラート
+		function delalert(row){
+			str = "";
+			switch(row){<?php
+			print "\n";
+			//動的にアラートを作成する。
+			if($alert){ 
+				for($i=0;$i<count($alert);$i++){
+					print "				case $i:\n";
+					print "					str = '$alert[$i]';\n";
+					print "					break;\n";
+				}
+			} ?>
+				default:
+					return false;
+			}
+			return confirm('電力会社名「' + str + '」の電力会社を\n削除してよろしいですか？');
+		}
+	-->	
+</script>
+</head>
+
+<body>
+	<form name="top" action="Menu.php" method=post>
+		<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+		<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+		<table width="100%" class="header">
+			<tr>
+				<td nowrap>
+					<font class="PageTitle">環境情報メンテナンス</font>
+				</td>
+				<td width="100" nowrap>
+					<input type="submit" class="CloseButton" name="logadmin1" value="メニューへ戻る" >
+				</td>
+				<td width="100" nowrap>
+					<input type="button" class="CloseButton" name="logadmin" value="　閉じる　" onclick="window.close();">
+				</td>
+			</tr>
+		</table>
+	</form>
+
+	<br>
+
+	<table border="0"  width="70%" align="center">
+		<form name="defaultForm" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+			<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+			<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+			<tr align="center">
+				<td align="center">
+					<table border="0" align="center" width="640" cellspacing="0">
+						<tr>
+							<td align="center">
+								<table border="0" align="right" width="90%">
+									<tr>
+										<td align="right" nowrap>
+											<input type="submit" class="button" name="download" value="ユーザー環境情報ダウンロード" style="width: 160pt;">
+										</td>
+									</tr>
+									
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<table border="0" width="90%" cellspacing="0">
+									<tr>
+										<td colspan=2 class=error align="left"> 
+											<?=$result->get('err_ecoinfo')?> 
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr align="center">
+							<td align="center">
+								<table border="0" width="90%" cellspacing="0">
+									<tr align="left">
+										<td align="left">
+											<b>デフォルトデータ</b>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr align="center">
+							<td align="center">
+								<table border="0" width="100%" cellspacing="0">
+									<tr align="center">
+										<td width="5%">
+										</td>
+										<td width="80%" align="left">
+											<?php $data = $result->get("ecoinfo"); //デフォルト環境情報の取得 ?>
+											<table border="1" width="100%" bordercolor="gray" cellspacing="0">
+												<tr>
+													<th align="right" nowrap>電気料金単価</th>
+													<td nowrap>
+														<table border="0" width="330">
+															<tr>
+																<td width="70%" align="left" nowrap>
+																	<input type="text"	style="ime-mode: disabled;" maxlength="7" name="electricity_cost"
+																	 value="<?=common::value_encode($result->get("electricity_cost",$data["electricity_cost"]))?>" size="30" >円/kWh
+																</td>
+																<td width="30%"  align="right" nowrap><font class="comment">※半角数字</font></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+												<tr>
+													<th align="right" nowrap>CO<sub>2</sub>排出係数</th>
+													<td nowrap>
+														<table border="0" width="330">
+															<tr>
+																<td width="70%" align="left" nowrap>
+																	<input type="text"	 style="ime-mode: disabled;" maxlength="7" name="co2_coefficient"
+																	 value="<?=common::value_encode($result->get("co2_coefficient",$data["co2_coefficient"]))?>" size="30" >kg-CO<sub>2</sub>/kWh
+																</td>
+																<td width="30%"  align="right" nowrap><font class="comment">※半角数字</font></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+												<tr>
+													<th align="right" nowrap>立木CO<sub>2</sub>年間吸収量</th>
+													<td nowrap>
+														<table border="0" width="330">
+															<tr>
+																<td width="70%" align="left" nowrap>
+																	<input type="text"	style="ime-mode: disabled;" maxlength="7" name="co2_to_tree"
+																	 value="<?=common::value_encode($result->get("co2_to_tree",$data["co2_to_tree"]))?>" size="30" >kg/本
+																</td>
+																<td width="30%"  align="right" nowrap><font class="comment">※半角数字</font></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+												<tr>
+													<th align="right" nowrap>年間週間数</th>
+													<td nowrap>
+														<table border="0" width="330">
+															<tr>
+																<td width="70%" align="left" nowrap>
+																	<input type="text"	style="ime-mode: disabled;" maxlength="2" name="weeks"
+																	 value="<?=common::value_encode($result->get("weeks",$data["weeks"]))?>" size="30" >週間
+																</td>
+																<td width="30%"  align="right" nowrap><font class="comment">※半角数字</font></td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</td>
+										<td width="15%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr align="center">
+							<td>
+								<table border="0" width="90%">
+									<tr>
+										<td align="right" nowrap width="40%">
+											&nbsp&nbsp<input type="submit" class="button" name="default" value=" 　 登録 　 ">
+										</td>
+										<td width="20%">
+										</td>
+										<td align="left" nowrap width="40%">
+											<input type="submit" class="button" name="reset" value="　 リセット　">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</form>
+					<tr>
+						<td><br></td>
+					</tr>
+					<tr align="center">
+						<td align="center">
+							<table border="0" width="90%" cellspacing="0">
+								<tr>
+									<td colspan=2 class=error align="left"> 
+										<?=$result->get('err_co2')?> 
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+			
+					<tr align="center">
+						<td align="center">
+							<table border="0" width="100%" cellspacing="0">
+								<tr>
+									<td width="5%">
+									</td>
+									<td width="90%" align="left">
+										<table border="1" width="100%" cellspacing="0" bordercolor="gray">
+											<tr>
+												
+												<th width="46%" align="center">電力会社</th>
+												<th width="40%" align="center">CO<sub>2</sub>排出係数(kg-CO<sub>2</sub>/kWh)</th>
+												<th width="7%"><br></th>
+												<th width="7%"><br></th>
+											</tr>
+											<?php $list = $result->get("co2list");
+												for($i=0;$i<count($list);$i++){ ?>
+											<form name="Listform<?=$i+1?>" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+												<tr>
+													<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+													<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+													<input type="hidden" name="row" value="<?=$i+1?>">
+													<input type="hidden" name="corp_cd" value="<?=common::value_encode($list[$i]['corp_cd']) ?>">
+													<td nowrap>
+														<input type="text" name="corp_name"
+														 value="<?php
+															if($list[$i]['corp_cd'] == $result->get("up_corp_cd")){
+																print common::value_encode(($result->get("up_corp_name", $list[$i]['corp_name'])));
+															}else{
+																print common::value_encode($list[$i]['corp_name']);
+															} ?>" maxlength="50" size="40" >
+													</td>
+													<td nowrap>
+														<input type="text" style="ime-mode: disabled;" name="co2_coefficient"
+														 value="<?php
+															if($list[$i]['corp_cd'] == $result->get("up_corp_cd")){
+																print common::value_encode(($result->get("up_co2_coefficient", $list[$i]['co2_coefficient'])));
+															}else{
+																print common::value_encode($list[$i]['co2_coefficient']);
+															} ?>" maxlength="7" size="10">
+														<font class="comment">&nbsp;&nbsp;※半角数字&nbsp;</font>
+													</td>
+													<td nowrap><input type="submit" class="ListButton" name="co2update" value=" 更新 "></td>
+													<td nowrap><input type="submit" class="ListButton" name="co2delete" value=" 削除 " onclick="return delalert(<?=$i ?>);"></td>
+												</tr>
+											</form>
+											<?php } ?>
+											<form name="Newform" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+												<tr>
+													<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+													<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+													<td nowrap>
+														<input type="text" name="corp_name"
+														 value="<?=common::value_encode($result->get("new_corp_name")) ?>" maxlength="50" size="40" >
+														<font class="comment"></font>
+													</td>
+													<td nowrap>
+														<input type="text" style="ime-mode: disabled;" name="co2_coefficient"
+														 value="<?=common::value_encode($result->get("new_co2_coefficient")) ?>" maxlength="7" size="10">
+														<font class="comment">&nbsp;&nbsp;※半角数字&nbsp;</font>
+													</td nowrap>
+													<td><input type="submit" class="ListButton" name="co2insert" value=" 登録 "></td>
+													<td><br></td>
+												</tr>
+											</form>
+										</table>
+									</td>
+									<td width="5%">
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+
+
+
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+<script type="text/javascript">
+<!--
+
+	<?php if($result->get("jsalert") != ""){ ?> alert('<?=$result->get("jsalert") ?>'); <?php } ?>
+
+-->
+</script>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<script type="text/javascript" src="./common/common.js"></script>
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<noscript>
+	<META HTTP-EQUIV=Refresh CONTENT="0; URL=./noscript.html">
+	</noscript>
+	<title>機種新規登録・更新</title>
+	
+</head>
+
+
+<body>
+<table width="100%" class="header">
+	<tr>
+		<td nowrap>
+			<font class="PageTitle">機種新規登録・更新</font>
+		</td>
+		<td width="120" nowrap>
+			<input type="button" class="CloseButton" name="Close" value="　閉じる　" onclick="window.close();">
+		</td>
+	</tr>
+</table>
+
+<br>
+
+<?php $productdata = $result->get("productdata"); ?>
+
+<form name=dataform action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+<table width=70% border=0 align="center">
+	<tr><td class="error"><?=$result->get("errmsg")?></td></tr>
+</table>
+<table border="1" align="center" width="70%" bordercolor="gray" cellspacing="0">
+	<tr>
+		<th align="right" nowrap>メーカー名</th>
+		<td align="left" nowrap>
+			<select name="maker_cd" style="width:135pt;">
+				<?php if($productdata["maker_name"]){ $data = $productdata["maker_name"]; ?>
+				<?php for($i=0;$i<count($data);$i++){ ?>
+				<option value="<?=$data[$i]["maker_cd"]?>" <?php if($productdata["maker_cd"] == $data[$i]["maker_cd"]){print "selected";} ?>><?=$data[$i]["maker_name"]?></option>
+				<?php }} ?>
+			</select>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>製品種別</th>
+		<td align="left" nowrap>
+			<select name="prod_type_cd" style="width:135pt;">
+				<?php if($productdata["prod_type_name"]){ $data = $productdata["prod_type_name"]; ?>
+				<?php for($i=0;$i<count($data);$i++){ ?>
+				<option value="<?=$data[$i]["prod_type_cd"]?>" <?php if($productdata["prod_type_cd"] == $data[$i]["prod_type_cd"]){print "selected";} ?>><?=$data[$i]["prod_type_name"]?></option>
+				<?php }} ?>
+			</select>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>モノクロ/カラー</th>
+		<td align="left" nowrap>
+			<select name="color_kbn" style="width:100pt;" >
+				<option value="0" <?php if($productdata["color_kbn"] == "0"){print "selected";} ?>>モノクロ</option>
+				<option value="1" <?php if($productdata["color_kbn"] == "1"){print "selected";} ?>>カラー</option>
+			</select>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>機種名</th>
+		<td nowrap><input type="text" name="product_name" maxlength="50" value="<?=common::value_encode($productdata["product_name"])?>" size="32" ></td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>プラグOFF可</th>
+		<td nowrap>
+			<input type="radio" name="plug_off_flg" value="1" <?php if($productdata["plug_off_flg"] == "1" or $productdata["plug_off_flg"] == ""){print "checked";} ?>>Y
+			<input type="radio" name="plug_off_flg" value="0" <?php if($productdata["plug_off_flg"] == "0"){print "checked";} ?>>N
+		</td>
+
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>省エネOFF可</th>
+		<td nowrap>
+			<input type="radio" name="eco_off_flg" value="1" <?php if($productdata["eco_off_flg"] == "1" or $productdata["plug_off_flg"] == ""){print "checked";} ?>>Y
+			<input type="radio" name="eco_off_flg" value="0" <?php if($productdata["eco_off_flg"] == "0"){print "checked";} ?>>N
+		</td>
+
+	</tr>
+	<tr>
+		<th align="right" nowrap>発売年月</th>
+		<td nowrap>
+			<input type="text" name="release_month_yy" maxlength="4" value="<?=common::value_encode($productdata["release_month_yy"])?>" size="6"  style="ime-mode: disabled;">年
+			<input type="text" name="release_month_mm" maxlength="2" value="<?=common::value_encode($productdata["release_month_mm"])?>" size="6"  style="ime-mode: disabled;">月
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+	
+	<tr>
+		<th align="right" nowrap>製品速度</th>
+		<td align="left" nowrap>
+			<select name="speed_kbn" style="width:100pt;" >
+				<option value="1" <?php if($productdata["speed_kbn"] == "1"){print "selected";} ?>>25以下</option>
+				<option value="2" <?php if($productdata["speed_kbn"] == "2"){print "selected";} ?>>26～40</option>
+				<option value="3" <?php if($productdata["speed_kbn"] == "3"){print "selected";} ?>>41以上</option>
+			</select>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>推定スリープ電力の有無</th>
+		<td nowrap>
+			<input type="radio" name="power_flg" value="1" <?php if($productdata["power_flg"] == "1"){print "checked";} ?>>有
+			<input type="radio" name="power_flg" value="0" <?php if($productdata["power_flg"] == "0" or $productdata["plug_off_flg"] == ""){print "checked";} ?>>無
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>ジョブ当たり面数</th>
+		<td nowrap>
+			<input type="text" name="power_per_paper" maxlength="4" value="<?=common::value_encode($productdata["power_per_paper"])?>" size="32"  style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>省エネONジョブ単位電力量(Wh)</th>
+		<td nowrap>
+			<input type="text" name="eco_on_pwr_p_job" maxlength="10" value="<?=common::value_encode($productdata["eco_on_pwr_p_job"])?>" size="32"  style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>省エネOFFジョブ単位電力量(Wh)</th>
+		<td nowrap>
+			<input type="text" name="eco_off_pwr_p_job" maxlength="10" value="<?=common::value_encode($productdata["eco_off_pwr_p_job"])?>" size="32"  style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>省エネON週間最終時間(h)</th>
+		<td nowrap>
+			<input type="text" name="eco_on_last_time" maxlength="10" value="<?=common::value_encode($productdata["eco_on_last_time"])?>" size="32"  style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>省エネOFF週間最終時間(h)</th>
+		<td nowrap>
+			<input type="text" name="eco_off_last_time" maxlength="10" value="<?=common::value_encode($productdata["eco_off_last_time"])?>" size="32"  style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>省エネON週間最終電力量(Wh)</th>
+		<td nowrap>
+			<input type="text" name="eco_on_last_power" maxlength="10" value="<?=common::value_encode($productdata["eco_on_last_power"])?>" size="32"  style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>省エネOFF週間最終電力量(Wh)</th>
+		<td nowrap>
+			<input type="text" name="eco_off_last_power" maxlength="10" value="<?=common::value_encode($productdata["eco_off_last_power"])?>" size="32"  style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+
+	<tr>
+		<th align="right" nowrap>スリープ電力(W)</th>
+		<td nowrap>
+			<input type="text" name="sleep_power" maxlength="10" value="<?=common::value_encode($productdata["sleep_power"])?>" size="32" style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+	<!-- <?php //↓2010/6/17追加 ?> -->
+	<tr>
+		<th align="right" nowrap>省エネON時最小ADV</th>
+		<td nowrap>
+			<input type="text" name="eco_on_minadv" maxlength="8" value="<?=common::value_encode($productdata["eco_on_minadv"])?>" size="32" style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+	<tr>
+		<th align="right" nowrap>省エネON時最大ADV</th>
+		<td nowrap>
+			<input type="text" name="eco_on_maxadv" maxlength="8" value="<?=common::value_encode($productdata["eco_on_maxadv"])?>" size="32" style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+	<tr>
+		<th align="right" nowrap>省エネOFF時最小ADV</th>
+		<td nowrap>
+			<input type="text" name="eco_off_minadv" maxlength="8" value="<?=common::value_encode($productdata["eco_off_minadv"])?>" size="32" style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+	<tr>
+		<th align="right" nowrap>省エネOFF時最大ADV</th>
+		<td nowrap>
+			<input type="text" name="eco_off_maxadv" maxlength="8" value="<?=common::value_encode($productdata["eco_off_maxadv"])?>" size="32" style="ime-mode: disabled;">
+			<font class="comment">※半角数字</font>
+		</td>
+	</tr>
+	<!-- <?php //↑2010/6/17追加 ?> -->
+</table>
+<br>
+<table border="0" align="center" width="50%">
+	<tr>
+		<td align="center">
+			<input type="hidden" name="seq_no" value="<?=$request->get("seq_no")?>">
+			<input type="hidden" name="unique_id" value="<?=$request->get("unique_id")?>">
+			<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+			<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+			<input type="submit" name="execute" class="button" style="width: 60pt;" value="<?php if($request->get("seq_no")==""){ ?>登録<?php }else{ ?>更新<?php } ?>">
+		</td>
+		<td align="center" >
+			<input type="submit" name="showdefault" class="button" style="width: 60pt;" value="リセット">
+		</td>
+	</tr>
+</table>
+</form>
+
+<script type="text/javascript">
+<!--
+
+<?php if($result->get("JSAlert") != ""){ ?> alert('<?=$result->get("JSAlert") ?>'); <?php } ?>
+
+<?php if($result->get("WindowClose",false)){ ?>window.close(); <?php } ?>
+
+-->
+</script>
+</body>
+</html>

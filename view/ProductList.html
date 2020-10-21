@@ -1,0 +1,349 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<?php $productdata = $result->get("productdata",false); ?>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<script type="text/javascript" src="./common/common.js"></script>
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<title>機種メンテナンス</title>
+	
+<script type="text/javascript">
+	
+	//表示コントロール
+	function showPage(mode){
+		if(mode == 1){
+			//機種一覧検索表示モード
+			document.getElementById('mainarea').style.display = "";
+			document.getElementById('subarea').style.display = "none";
+			
+			switchfrm.listmode.disabled = true;
+			switchfrm.updatemode.disabled = false;
+		}else{
+			//機種一括更新モード
+			document.getElementById('mainarea').style.display = "none";
+			document.getElementById('subarea').style.display = "";
+
+			switchfrm.listmode.disabled = false;
+			switchfrm.updatemode.disabled = true;
+		}
+	}
+	
+	function toentry(seq_no){
+		var win = window.open("","entryform","scrollbars=yes,width=700,height=650");
+		document.goentry.seq_no.value = seq_no;
+		document.goentry.target = "entryform";
+		document.goentry.submit();
+		win.focus();
+	}
+	
+	function init(){
+		showPage(<?=$request->get("pagemode",1)?>);
+		<?php if($result->get("JSAlert") != ""){ ?>alert('<?=$result->get("JSAlert")?>');<?php } ?>
+	}
+	
+	//削除ボタンのアラート
+	function delalert(row){
+		switch(row){
+		<?php print "\n";
+		//動的にアラートを作成する。
+		if($productdata){ 
+			for($i=0;$i<count($productdata);$i++){
+				print "				case $i:\n";
+				print "					str = '" . str_replace("'", "\\'", $productdata[$i]["product_name"]) . "';\n";
+				print "					break;\n";
+			}
+		} ?>
+			default:
+				return false;
+		}
+		return confirm('機種 「' + str + '」 を削除してよろしいですか？');
+	}
+	
+	
+</script>
+</head>
+
+<body onload="init();">
+<form name="headfrm" action="Menu.php" method="post">
+	<table width="100%" class="header">
+		<tr>
+			<td nowrap>
+				<font class="PageTitle">機種メンテナンス</font>
+			</td>
+			<td width="100" nowrap>
+				<input type="submit" class="CloseButton" name="LogAdmin1" value="メニューへ戻る">
+				<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+				<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+			</td>
+			<td width="120" nowrap>
+				<input type="button" class="CloseButton" name="LogAdmin" value="  閉じる  " onclick="window.close();">
+			</td>
+		</tr>
+	</table>
+</form>
+	<br>
+<form name="switchfrm">
+	<table align="center" width="90%" bordercolor="gray" cellspacing="0" cellpadding="7">
+		<tr>
+			<td nowrap>
+				<input type="button" name="listmode" class="button" value="　　　機種検索　　　" onclick="showPage(1);" >
+				<input type="button" name="updatemode" class="button" value="機種情報一括更新" onclick="showPage(2);" >
+				<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+				<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+			</td>
+		</tr>
+	</table>
+</form>
+	<br>
+	
+	<div id="subarea">
+	<form name="updatefrm" enctype="multipart/form-data" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+	<table width="90%" align="center">
+		<tr>
+			<td class="error">
+				<?php if($request->get("pagemode")=="2" && $result->get("err")){ ?>
+				<?=$result->get("err")?>
+				<?php } ?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table border="1" align="left" width="80%" bordercolor="gray" cellspacing="0" cellpadding="7">
+					<tr>
+						<td>
+							<table align="left" width="100%">
+								<tr>
+									<td align="right" >
+										機種情報ファイル(csv)
+										<input type="hidden" name="pagemode" value="2">
+									</td>
+									<td align="left">
+										<input type="file" class="Upload" name="productdata" value="" size="50">
+										&nbsp;&nbsp;&nbsp;
+										<input type="submit" class="button" name="doupload" value=" アップロード " onclick="return confirm('指定のファイルで機種の一括更新を行います。よろしいですか？');">
+										<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+										<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+									</td>
+								</tr>	
+							</table>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	</form>
+	
+	</div>
+	
+<div id="mainarea">
+<form name="researchfrm" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+<table id="Prolist" border="1" align="center" width="90%" bordercolor="gray" cellspacing="0" cellpadding="7">
+	<tr>
+		<td nowrap>
+			<table border="0" align="left" width="100%" cellspacing="5">
+		 		<tr>
+					<td align="right" nowrap>メーカー</td>
+					<td align="left" nowrap>
+						<select name="maker_cd" style="width:135pt;">
+							<option value="">全て</option>
+							<?=common::createoptions($result->get("makerlist"),"maker_cd","maker_name",$session->get("maker_cd"))?>
+						</select>
+					</td>
+					
+						<td align="right" nowrap>ソート1</td>
+					<td align="left" nowrap>
+						<select name="sort_key1" style="width:100pt;">
+							<option value="1">機種名</option>
+							<option value="2" <?php if($session->get("sort_key1")=="2"){print "selected";} ?>>メーカー</option>
+							<option value="3" <?php if($session->get("sort_key1")=="3"){print "selected";} ?>>製品種別</option>
+							<option value="5" <?php if($session->get("sort_key1")=="5"){print "selected";} ?>>モノクロ／カラー</option>
+							<option value="6" <?php if($session->get("sort_key1")=="6"){print "selected";} ?>>製品速度</option>
+							<option value="7" <?php if($session->get("sort_key1")=="7"){print "selected";} ?>>登録日</option>
+							<option value="8" <?php if($session->get("sort_key1")=="8"){print "selected";} ?>>更新日</option>
+						</select>
+						の
+						<select name="sort_kbn1" style="width:60pt;">
+							<option value="1">昇順</option>
+							<option value="2" <?php if($session->get("sort_kbn1")=="2"){print "selected";} ?>>降順</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td align="right" width="10%" nowrap>製品速度</td>
+					<td align="left" nowrap>
+						<select name="speed_kbn" style="width:135pt;">
+							<option value="">全て</option>
+							<option value="1" <?php if($session->get("speed_kbn")=="1"){print "selected";} ?>>25以下</option>
+							<option value="2" <?php if($session->get("speed_kbn")=="2"){print "selected";} ?>>26～40</option>
+							<option value="3" <?php if($session->get("speed_kbn")=="3"){print "selected";} ?>>41以上</option>
+					</td>
+					<td align="right" nowrap>ソート2</td>
+					<td nowrap>
+						<select name="sort_key2" style="width:100pt;">
+							<option value="1">機種名</option>
+							<option value="2" <?php if($session->get("sort_key2")=="2"){print "selected";} ?>>メーカー</option>
+							<option value="3" <?php if($session->get("sort_key2")=="3"){print "selected";} ?>>製品種別</option>
+							
+							<option value="5" <?php if($session->get("sort_key2")=="5"){print "selected";} ?>>モノクロ／カラー</option>
+							<option value="6" <?php if($session->get("sort_key2")=="6"){print "selected";} ?>>製品速度</option>
+							<option value="7" <?php if($session->get("sort_key2")=="7"){print "selected";} ?>>登録日</option>
+							<option value="8" <?php if($session->get("sort_key2")=="8"){print "selected";} ?>>更新日</option>
+						</select>
+						の
+						<select name="sort_kbn2" style="width:60pt;">
+							<option value="1">昇順</option>
+							<option value="2" <?php if($session->get("sort_kbn2")=="2"){print "selected";} ?>>降順</option>
+						</select>
+					</td>	
+				</tr>
+				<tr>
+					
+					<td align="right" nowrap>モノクロ/カラー</td>
+					<td align="left" nowrap>
+						<select name="color_kbn" style="width:135pt;">
+							<option value="">全て</option>
+							<option value="0" <?php if($session->get("color_kbn")=="0"){print "selected";} ?>>モノクロ</option>
+							<option value="1" <?php if($session->get("color_kbn")=="1"){print "selected";} ?>>カラー</option>
+						</select>
+					</td>
+					<td></td><td></td>
+				</tr>				
+				<tr>
+					<td align="right" nowrap>製品種別</td>
+					<td align="left" nowrap>
+						<select name="prod_type_cd" style="width:135pt;">
+							<option value="">全て</option>
+							<?=common::createoptions($result->get("prodtypelist"),"prod_type_cd","prod_type_name",$session->get("prod_type_cd"))?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td align="right" width="15%" nowrap>機種名</td>
+					<td align="left" nowrap>
+						<input type="text" name="product_name" value="<?=common::value_encode($session->get("product_name"))?>" size="32">
+						<font class="comment">※部分一致</font>
+					</td>
+				</tr>
+				<tr>
+					<td align="right" colspan="4" nowrap>
+						<input type="submit" class="button" name="search" value="     検索     " >
+						<input type="button" class="button" name="entry" value="  新規登録  " onclick="toentry('');">
+						&nbsp;&nbsp;&nbsp;
+						<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+						<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					</td>
+				</tr>	
+			</table>
+		</td>
+	</tr>	
+</table>
+</form>
+
+<?php if($productdata){ ?>
+<form name="researchfrm" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+<table border="0" align="center" width="90%" >
+	<tr>
+		<td align="right" nowrap>
+			<input type="submit" class="button" name="research" value="    再表示    " >
+			<input type="submit" class="button" name="download" value="CSVダウンロード" >
+			<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+			<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+		</td>
+	</tr>
+</table>
+</form>
+<?php } ?>
+
+<?php if($productdata){ ?>
+<table border="0"  align="center" width="90%" cellspacing="0">
+	<tr>
+		<td align=right>
+			<form name="scrollfrm1" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+			<input type="hidden" name="currentpage" value="<?=common::value_encode($request->get("currentpage", 1))?>">
+			<?php if($request->get("currentpage", 1) > 1){ ?>
+				<input type="submit" class="button" name="MovePreviousPage" value="前頁へ">
+			<?php } ?>
+			<?php if($request->get("currentpage", 1) < $result->get("maxpage", 1)){ ?>
+				<input type="submit" class="button" name="MoveNextPage" value="次頁へ">
+			<?php } ?>
+			<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+			<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+			</form>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table border="1"  align="center" width="100%" cellspacing="0" bordercolor="gray">
+				<tr>
+					<th width="20%" nowrap>機種名</th>
+					<th width="20%" nowrap>メーカー名</th>
+					
+					<th width="12%" nowrap>製品種別</th>
+					<th width="10%" nowrap>モノクロ/カラー</th>
+					<th width="10%" nowrap>製品速度</th>
+					<th nowrap>登録日</th>
+					<th nowrap>更新日</th>
+					<th><br></th>
+					<th><br></th>
+				</tr>
+				<?php for($i=0;$i<count($productdata);$i++){ ?>
+				<form method="post" action="<?=$_SERVER['SCRIPT_NAME']?>" name="listfrm<?=$i?>">
+				<tr>
+					<td align="right"><?=common::disp_encode($productdata[$i]["product_name"])?></td>
+					<td align="right"><?=common::disp_encode($productdata[$i]["maker_name"])?></td>
+					
+					<td align="right"><?=common::disp_encode($productdata[$i]["prod_type_name"])?></td>
+					<td align="right"><?=common::disp_encode($productdata[$i]["color_kbn_name"])?></td>
+					<td align="right"><?=common::disp_encode($productdata[$i]["speed_kbn_name"])?></td>
+					<td align="right"><?=common::disp_encode($productdata[$i]["regist_time"])?></td>
+					<td align="right"><?=common::disp_encode($productdata[$i]["update_time"])?></td>
+					<td>
+						<input type="button" class="ListButton" name="doupdate" value=" 更新 " onclick="toentry('<?=common::value_encode($productdata[$i]["seq_no"])?>');">
+					</td>
+					<td>
+						<input type="hidden" name="seq_no" value="<?=common::disp_encode($productdata[$i]["seq_no"])?>">
+						<input type="hidden" name="currentpage" value="<?=common::value_encode($request->get("currentpage", 1))?>">
+						<input type="submit" class="ListButton" name="dodelete" value=" 削除 " onclick="return delalert(<?=$i?>);">
+						<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+						<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					</td>
+				</tr>
+				</form>
+				<?php } ?>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td align=right>
+		<br>
+		<form name="scrollfrm2" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+			<input type="hidden" name="currentpage" value="<?=common::value_encode($request->get("currentpage", 1))?>">
+			<?php if($request->get("currentpage", 1) > 1){ ?>
+				<input type="submit" class="button" name="MovePreviousPage" value="前頁へ">
+			<?php } ?>
+			<?php if($request->get("currentpage", 1) < $result->get("maxpage", 1)){ ?>
+				<input type="submit" class="button" name="MoveNextPage" value="次頁へ">
+			<?php } ?>
+			<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+			<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+		</form>
+		</td>
+	</tr>
+</table>
+<?php } ?>
+
+<form name="goentry" method="POST" action="ProductEntry.php">
+<input type="hidden" name="seq_no" value="">
+<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+</form>
+
+<br><br><br>
+</div>
+
+</body>
+</html>

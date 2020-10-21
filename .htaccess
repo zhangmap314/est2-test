@@ -1,0 +1,17 @@
+php_value include_path ".;c:\xampp\htdocs\est2-test\class;c:\xampp\htdocs\est2-test\view"
+php_flag short_open_tag On
+#php_flag magic_quotes_gpc Off
+php_value session.gc_maxlifetime 3600
+php_value memory_limit 512M
+#php_value upload_max_filesize 10M
+#php_value post_max_size 10M
+
+php_flag display_errors On
+
+
+#RedirectMatch 301 .* https://estweb.mdd.ricoh.co.jp/Maintenance.html
+
+<Files ~ "^.(htpasswd|htaccess)$">
+deny from all
+</Files>
+

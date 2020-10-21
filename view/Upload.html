@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<noscript>
+	<META HTTP-EQUIV=Refresh CONTENT="0; URL=./noscript.html">
+	</noscript>
+	<title>ファイルアップロード</title>
+<script type="text/javascript" src="./common/common.js"></script>
+</head>
+<body>
+<form name=headfrm action="Menu.php" method=post>
+<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+<table width="100%" class="header">
+	<tr>
+		<td nowrap>
+			<font class="PageTitle">ファイルアップロード</font>
+		</td>
+		<td width="100" nowrap>
+			<input type="submit" class="CloseButton" name="tomenu" value="メニューへ戻る">
+			<input type=hidden name=unique_id value="<?=$request->get("unique_id")?>">
+		</td>
+		<td width="120" nowrap>
+			<input type="button" class="CloseButton" name="logadmin" value="　閉じる　" onclick="window.close();">
+		</td>
+	</tr>
+</table>
+</form>
+<tr><br><tr>
+<?php $w_err = $result->get('err'); ?>
+<?php if(is_array($w_err) and sizeof($w_err) > 0){ ?>
+<table border="0" align="center" width="70%" cellspacing="0">
+	<?php     foreach($w_err as $w_err_value){ ?>
+	<tr>
+		<td colspan=2 class=error> 
+			<?=$w_err_value?> 
+		</td>
+	</tr>
+	<?php     } //foreachのclose ?>
+</tabel>
+<?php } //ifのclose ?>
+<table border="0" align="center" width="10%">
+	<form name="form1" action="<?=$_SERVER['SCRIPT_NAME']?>" enctype="multipart/form-data" method=post>
+	<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+	<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+	<tr>
+		<td colspan="3" align="right" nowrap>ご使用にあたって(pdf)</td>
+		<td nowrap><input type="file" class="Upload" name="howto" value="" size="45"></td>
+	</tr>
+	<tr>
+		<td colspan="3" align="right" nowrap>操作方法(pdf)</td>
+		<td nowrap><input type="file" class="Upload" name="manual" value="" size="45"></td>
+	</tr>
+	<tr>
+		<td colspan="3" align="right" nowrap>テロップ情報アップロード(txt)</td>
+		<td nowrap><input type="file" class="Upload" name="telop" value="" size="45"></td>
+	</tr>
+	<tr>
+		<td colspan="3" align="right" nowrap>シミュレーションワーニング文書(txt)</td>
+		<td nowrap><input type="file" class="Upload" name="sim_warning" value="" size="45"></td>
+	</tr>
+	<tr>
+		<td colspan="3" align="right" nowrap>ログダウンロードワーニング文書(txt)</td>
+		<td nowrap><input type="file" class="Upload" name="log_warning" value="" size="45"></td>
+	</tr>
+	<tr>
+		<td colspan="3" align="right" nowrap>シミュレーション注意事項(txt)</td>
+		<td nowrap><input type="file" class="Upload" name="sim_result_warning" value="" size="45"></td>
+	</tr>
+	
+	<tr>
+		<td colspan="4"><br></td>
+	</tr>
+	<tr>
+		<td colspan="4" align="left">提案書テンプレート</td>
+	</tr>
+	<?php // アップロード済み提案書の数で処理を分岐 ?>
+	<?php // 1件以上存在する場合は、アップロード済みファイルの表示を行う ?>
+	<?php $w_upl_idea = $result->get('upl_idea'); ?>
+	<?php if(sizeof($w_upl_idea) > 0){ ?>
+	<tr>
+		<td width="2%"></td>
+		<td colspan="3">アップロード済みファイル
+		<input type="hidden" name="del_fname" value="dummy"></td>
+	</tr>
+	<?php foreach($w_upl_idea as $w_upl_idea_key => $w_upl_idea_value){ ?>
+	<?php // ファイル名から拡張子をカット ?>
+	<?php $w_upl_fname_tr = substr($w_upl_idea_value, 0, strrpos($w_upl_idea_value, '.')) ?>
+	<tr>
+		<td colspan="2" width="4%"></td>
+		<td width="30%" align="right" nowrap><?=$w_upl_fname_tr?></td>
+		<td align="left">
+			<input type="submit" class="button" name="delete" value=" 削 除 " onclick="document.form1.del_fname.value='<?=$w_upl_idea_value?>';return confirm('<?=$w_upl_fname_tr?>を削除してよろしいですか？');">
+		</td>
+	</tr>
+	<?php } //foreachのclose ?>
+	<tr>
+		<td colspan="4"><br></td>
+	</tr>
+	<?php } //ifのclose ?>
+	<tr>
+		<td width="2%"></td>
+		<td colspan="3">新規アップロード</td>
+	</tr>
+	<tr>
+		<td colspan="2" width="4%"></td>
+		<td align="right" nowrap>提案書テンプレート１(xls)</td>
+		<td align="left">
+			<input type="file" class="Upload" name="idea1" value="" size="45">
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" width="4%"></td>
+		<td align="right" nowrap>提案書テンプレート２(xls)</td>
+		<td align="left">
+			<input type="file" class="Upload" name="idea2" value="" size="45">
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" width="4%"></td>
+		<td align="right" nowrap>提案書テンプレート３(xls)</td>
+		<td align="left">
+			<input type="file" class="Upload" name="idea3" value="" size="45">
+		</td>
+	</tr>
+	
+	<tr><td colspan="4"><br></td></tr>
+	<tr>
+		<td colspan="3"></td>
+		<td align="right" width="60" nowrap>
+		<input type="submit" class="button" name="upload" value=" 　 アップロード 　">
+		<input type=hidden name="unique_id" value="<?=$request->get('unique_id')?>">
+		</td>
+		
+	</tr>
+	</form>
+</table>
+<script type="text/javascript">
+<!--
+
+<?php if($result->get("JSAlert") != ""){ ?> alert("<?=$result->get("JSAlert") ?>"); <?php } ?>
+
+-->
+</script>
+
+</body>
+</html>

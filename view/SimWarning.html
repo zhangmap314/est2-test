@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<script type="text/javascript" src="./common/common.js"></script>
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<noscript>
+	<META HTTP-EQUIV=Refresh CONTENT="0; URL=./noscript.html">
+	</noscript>
+	<title>利用規約</title>
+
+<script type="text/javascript">
+</script>
+
+</head>
+<body>
+	<form name="Menu" action="Menu.php" method="post">
+		<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+		<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+		<table width="100%"  class="header">
+			<tr>
+				<td align="left" nowrap>
+					<font class="PageTitle">利用規約</font>
+				</td>
+				<?php if($session->get("user_lebel") != "0"){ ?>
+				<td width="100" nowrap>
+					<input type="submit" class="CloseButton" name="logadmin1" value="メニューへ戻る" >
+				</td>
+				<?PHP } ?>
+				<td width="120" nowrap>
+					<input type="button" class="CloseButton" name="Close" value="　閉じる　" onclick="window.close();">
+				</td>
+			</tr>
+		</table>
+	</form>
+	<br>
+	<table border="0" align="center" width="80%">
+		<tr>
+			<td nowrap><textarea name="warningtext" tabindex="0" class="sim" readonly><?=$result->get("warningtext") ?></textarea></td>
+		</tr>
+		<tr>
+			<td nowrap align="right">
+				<form name="simulation" action="SimWarning.php"  method="post">
+					<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+					<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+					<input type="submit" class="MenuButton" name="ToSimulation" value="合意する">
+				</form>
+			</td>
+		</tr>
+	</table>
+	<?php if(strlen($result->get("redirect")) > 0){ ?>
+	<form name="redirect" action="Simulation.php" method="post">
+		<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+		<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+		<input type="hidden" name="redirect" value="redirect">
+	</form>
+	<script type="text/javascript" language="javascript">
+	<!--
+		document.forms["redirect"].submit();
+	-->
+	</script>
+	<?php } ?>
+</body>
+</html>

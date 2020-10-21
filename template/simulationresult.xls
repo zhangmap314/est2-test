@@ -1,0 +1,175 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=Shift-JIS">
+</head>
+<body>
+	<center>
+		<table border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td align="left">
+					お客様名：<!--cust_name-->
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<br>
+					シミュレーション年数：　<!--foryears-->年
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table border="1" bordercolor=gray cellpadding="0" cellspacing="0">
+						<tr>
+							<td colspan=11>ご使用機種</td>
+						</tr>
+						<tr bgcolor=#8CFFB1 align="center">
+							<td>NO</td>
+							<td>モノクロ/<br>カラー</td>
+							<td>機種名</td>
+							<td>台数</td>
+							<td>ADV</td>
+							<td>省エネ<br>モード</td>
+							<td>プラグ</td>
+							<td>消費電力量<br>(kWh)</td>
+							<td>電気料金<br>(円)</td>
+							<td>CO<sub>2</sub>排出量<br>(kg-CO<sub>2</sub>)</td>
+							<td>立木換算<br>(本)</td>
+						</tr>
+						<!--cur_data-->
+						<tr>
+							<td colspan="7" bgcolor=#8CFFB1 align="center">合計</td>
+							<td align="right"><!--cur_totalpower--></td>
+							<td align="right"><!--cur_totalcost--></td>
+							<td align="right"><!--cur_totalco2--></td>
+							<td align="right"><!--cur_totaltrees--></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr><td><br><br></td></tr>
+			<tr>
+				<td>
+					<table border="1" bordercolor=gray cellpadding="0" cellspacing="0">
+						<tr>
+							<td colspan=11>ご提案機種</td>
+						</tr>
+						<tr bgcolor=#ACD6FF align="center">
+							<td>NO</td>
+							<td>モノクロ/<br>カラー</td>
+							<td>機種名</td>
+							<td>台数</td>
+							<td>ADV</td>
+							<td>省エネ<br>モード</td>
+							<td>プラグ</td>
+							<td>消費電力量<br>(kWh)</td>
+							<td>電気料金<br>(円)</td>
+							<td>CO<sub>2</sub>排出量<br>(kg-CO<sub>2</sub>)</td>
+							<td>立木換算<br>(本)</td>
+						</tr>
+						<!--new_data-->
+						<tr>
+							<td colspan="7" bgcolor=#ACD6FF align="center">合計</td>
+							<td align="right"><!--new_totalpower--></td>
+							<td align="right"><!--new_totalcost--></td>
+							<td align="right"><!--new_totalco2--></td>
+							<td align="right"><!--new_totaltrees--></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr><td><br><br></td></tr>
+			<tr>
+				<td>
+					<h4 align="center">削減効果</h4>
+					<table border="1" bordercolor=gray cellpadding="0" cellspacing="0">
+						<tr>
+							<td colspan="2" width="180">消費電力量<br>(kWh)</td>
+							<td></td>
+							<td colspan="2" width="180">電気料金<br>(円)</td>
+							<td></td>
+							<td colspan="2" width="180">CO<sub>2</sub>削減量<br>(kg-CO<sub>2</sub>)</td>
+							<td></td>
+							<td colspan="2" width="180">立木本数換算<br>(本)</td>
+						</tr>
+						<tr align="right">
+							<td bgcolor=#FFE79B colspan="2" width="180"><!--totalpower--></td>
+							<td></td>
+							<td bgcolor=#FFE79B colspan="2" width="180"><!--totalcost--></td>
+							<td></td>
+							<td bgcolor=#FFE79B colspan="2" width="180"><!--totalco2--></td>
+							<td></td>
+							<td bgcolor=#FFE79B colspan="2" width="180"><!--totaltrees--></td>
+						</tr>
+						 
+					</table>
+				</td>
+			</tr>
+			<tr><td><br><br></td></tr>
+			<tr>
+				<td>
+					<!--simresultwarning-->
+				</td>
+			</tr>
+			<tr><td><br></td></tr>
+			<tr>
+				<td>
+					<!--suiteimsg-->
+				</td>
+			</tr>
+			<tr><td><br></td></tr>
+			<tr>
+				<td>
+					<b>換算係数表</b>
+					<table border="1" bordercolor=gray cellpadding="0" cellspacing="0">
+						<tr>
+							<td colspan="3" align="right" bgcolor="#ffff66">
+								電気料金単価&nbsp;
+							</td>
+							<td colspan="2">
+								<!--base_denki_tanka-->
+							</td>
+							<td colspan="2">
+								円/kWh
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" align="right" bgcolor="#ffff66">
+								CO<sub>2</sub>排出係数&nbsp;
+							</td>
+							<td colspan="2">
+								<!--base_co2keisu-->
+							</td>
+							<td colspan="2">
+								kg-CO2/kWh
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" align="right" bgcolor="#ffff66">
+								立木CO<sub>2</sub>年間吸収量&nbsp;
+							</td>
+							<td colspan="2">
+								<!--base_tree_kyushu-->
+							</td>
+							<td colspan="2">
+								kg/本
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3" align="right" bgcolor="#ffff66">
+								年間週数&nbsp;
+							</td>
+							<td colspan="2">
+								<!--base_weeks-->
+							</td>
+							<td colspan="2">
+								週
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		
+	</center>
+	</body>
+</html>

@@ -1,0 +1,13 @@
+						<tr align="right">
+							<td><!--new_no--></td>
+							<td><!--new_color--></td>
+							<td><!--new_prod_name--></td>
+							<td><!--new_printers--></td>
+							<td><!--new_papers--></td>
+							<td><!--new_ecomode--></td>
+							<td><!--new_plugmode--></td>
+							<td><!--new_yearpower--></td>
+							<td><!--new_yearcost--></td>
+							<td><!--new_yearco2--></td>
+							<td><!--new_yeartrees--></td>
+						</tr>

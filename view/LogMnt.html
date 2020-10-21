@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-style-type" content="text/css">
+	<meta http-equiv="content-script-type" content="text/javascript">
+	<script type="text/javascript" src="./common/common.js"></script>
+	<LINK type="text/css" rel="stylesheet" href="./common/Simulation.css">
+	<noscript>
+	<META HTTP-EQUIV=Refresh CONTENT="0; URL=./noscript.html">
+	</noscript>
+	<title>ログ管理</title>
+<?php //接続者の管理権限をチェック（true:フル管理者、false:それ以外）
+$ck_admin = ($session->get("user_lebel") == USER_LEBEL_ADMIN) ? true : false;
+//target_logの判定値取得
+if($request->get("target_log") == ""){
+	$ck_target = "2";
+} else {
+	$ck_target = $request->get("target_log");
+}
+$rq_fromyear = $request->get("fromyear");
+$rq_toyear   = $request->get("toyear");
+ ?>
+
+
+<script type="text/javascript">
+<!--
+	//コンボボックスの開始年・終了年リストを取得
+	var logyear = new Array(<?php
+	if($result->get("YEARLIST",false)){
+		$data = $result->get("YEARLIST");
+		for($i=0;$i<count($data);$i++){
+			$outStr = "\"".$data[$i]["log_year"]."\"";
+			if($i>0){
+				$outStr = ','.$outStr;
+			}
+			print $outStr;
+		}
+	} ?>);
+	var accyear = new Array(<?php
+	if($result->get("ACCYEARLIST",false)){
+		$data = $result->get("ACCYEARLIST");
+		for($i=0;$i<count($data);$i++){
+			$outStr = "\"".$data[$i]["log_year"]."\"";
+			if($i>0){
+				$outStr = ','.$outStr;
+			}
+			print $outStr;
+		}
+	} ?>);
+<?php if($ck_admin){ ?>
+	var dlyear = new Array(<?php
+		if($result->get("DLYEARLIST",false)){
+			$data = $result->get("DLYEARLIST");
+			for($i=0;$i<count($data);$i++){
+				$outStr = "\"".$data[$i]["dl_year"]."\"";
+				if($i>0){
+					$outStr = ','.$outStr;
+				}
+				print $outStr;
+			}
+		} ?>);
+<?php } ?>
+
+	var rq_fromyear,rq_toyear;
+	rq_fromyear = '<?=$rq_fromyear?>';
+	rq_toyear = '<?=$rq_toyear?>';
+
+	function setyear(kbn){
+		document.frm1.fromyear.length = 0;
+		document.frm1.fromyear.selectedIndex = 0;
+		document.frm1.toyear.length = 0;
+		document.frm1.toyear.selectedIndex = 0;
+		if(kbn == 0){//システム使用ログ
+			for (var i = 0; i < logyear.length; i++) {
+				document.frm1.fromyear.options[i] = new Option(logyear[i], logyear[i]);
+				if (rq_fromyear == logyear[i]) {
+					document.frm1.fromyear.options[i].selected = true;
+				}
+				document.frm1.toyear.options[i] = new Option(logyear[i], logyear[i]);
+				if (rq_toyear == logyear[i]) {
+					document.frm1.toyear.options[i].selected = true;
+				}
+			}
+		}else if(kbn == 2){//アクセス使用ログ
+			for (var i = 0; i < accyear.length; i++) {
+				document.frm1.fromyear.options[i] = new Option(accyear[i], accyear[i]);
+				if (rq_fromyear == accyear[i]) {
+					document.frm1.fromyear.options[i].selected = true;
+				}
+				document.frm1.toyear.options[i] = new Option(accyear[i], accyear[i]);
+				if (rq_toyear == accyear[i]) {
+					document.frm1.toyear.options[i].selected = true;
+				}
+			}
+<?php if($ck_admin){ ?>
+		}else{//ログダウンロード履歴
+			for (var i = 0; i < dlyear.length; i++) {
+				document.frm1.fromyear.options[i] = new Option(dlyear[i], dlyear[i]);
+				if (rq_fromyear == dlyear[i]) {
+					document.frm1.fromyear.options[i].selected = true;
+				}
+				document.frm1.toyear.options[i] = new Option(dlyear[i], dlyear[i]);
+				if (rq_toyear == dlyear[i]) {
+					document.frm1.toyear.options[i].selected = true;
+				}
+			}
+<?php } ?>
+		}
+	}
+	
+	function onLoadFnc(){
+		setyear(<?=$ck_target?>);
+		<?php if($result->get("JSAlert") != ""){ ?> alert('<?=$result->get("JSAlert") ?>'); <?php } ?>
+	}
+
+	function doDownloadAction(){
+		//ダウンロードボタン押下時処理
+		document.frm1.doDelete.value = '';
+		document.getElementById("errormsg").innerHTML=" ";
+		document.frm1.download.value = 'DoDownload';
+		document.frm1.submit();
+
+	}
+	
+	function doDelAction(){
+
+		document.frm1.download.value = '';
+		document.frm1.doDelete.value = '';
+		document.getElementById("errormsg").innerHTML=" ";
+		
+		if(!confirm('指定期間のデータを削除してよろしいですか？')){ return false; }
+		
+		document.frm1.download.value = 'DoDownload';
+		document.frm1.submit();
+		
+		//5秒後に再度確認メッセージを表示して、削除を行う。
+		setTimeout(doDelData, 5000);
+	
+	}
+	
+	function doDelData(){
+
+		document.frm1.download.value = '';
+		document.frm1.doDelete.value = '';
+		
+		document.frm1.winMode.value = 'sub';
+		document.frm1.target = "delwin";
+		
+		document.frm1.submit();
+		
+		document.frm1.winMode.value = 'main';
+		document.frm1.target = "_self";
+
+	}
+	
+-->
+</script>
+
+</head>
+
+<body onload="onLoadFnc();">
+<table width="100%" class="header">
+	<tr>
+		<td nowrap>
+			<font class="PageTitle">ログ管理</font>
+		</td>
+		<td width="120" nowrap>
+			<input type="button" class="CloseButton" name="Close" value="　閉じる　" onclick="window.close();">
+		</td>
+	</tr>
+</table>
+<br>
+<form name="frm1" action="<?=$_SERVER['SCRIPT_NAME']?>" method=post>
+<input type="hidden" name="caller" value="<?=$session->get("caller")?>">
+<input type="hidden" name="user_unique_id" value="<?=$session->get("user_unique_id")?>">
+
+<table border="0" align="center" width="90%">
+	<tr>
+		<td class="error" id="errormsg"><?=$result->get("errmsg")?></td>
+	</tr>
+</table>
+<table border="0" align="center" width="90%">
+	<tr>
+		<td>
+			対象ログデータ&nbsp;&nbsp;
+			<input type="radio" name="target_log" value="2" id="access_log" onClick="setyear(2);" <?php if($ck_target == "2"){print "checked";} ?>>
+			<label for="access_log">アクセスログ</label>
+			<input type="radio" name="target_log" value="0" id="sys_log" onClick="setyear(0);" <?php if($ck_target == "0"){print "checked";} ?>>
+			<label for="sys_log">システム使用ログ</label>
+	<?php if($ck_admin){ ?>
+			<input type="radio" name="target_log" value="1" id="download_hist" onClick="setyear(1);" <?php if($ck_target == "1"){print "checked";} ?>>
+			<label for="download_hist">ログダウンロード履歴</label>
+	<?php } //if文の終了 ?>
+		</td>
+	</tr>
+	<tr>
+		<td><br></td>
+	</tr>
+ 	<tr>
+ 		<td nowrap>期間指定</td>
+ 	</tr>
+ 	<tr>
+ 		<td nowrap>
+ 			<table>
+ 				<tr>
+ 					<td nowrap>開始</td>
+ 					<td align="left" nowrap>
+			 			<select name="fromyear" style="width:40pt;">
+						</select>
+					</td>
+					<td nowrap>年</td>
+					<td nowrap>
+						<select name="frommonth" style="width:30pt;">
+							<?php for($i=1; $i<=12; $i++){ ?>
+							<option value="<?=sprintf("%02d", $i)?>" <?php if($request->get("frommonth")==sprintf("%02d", $i)){ ?>selected<?php } ?>><?=sprintf("%02d", $i)?></option>
+							<?php } ?>
+						</select>
+					</td>
+					<td nowrap>月</td>
+					<td nowrap>
+						<select name="fromday" style="width:30pt;">
+							<?php for($i=1; $i<=31; $i++){ ?>
+							<option value="<?=sprintf("%02d", $i)?>" <?php if($request->get("fromday")==sprintf("%02d", $i)){ ?>selected<?php } ?>><?=sprintf("%02d", $i)?></option>
+							<?php } ?>
+						</select>
+					</td>
+					<td nowrap>日</td>
+				</tr>
+				<tr>
+ 					<td nowrap>終了</td>
+ 					<td align="left" nowrap>
+			 			<select name="toyear" style="width:40pt;">
+						</select>
+					</td>
+					<td nowrap>年</td>
+					<td nowrap>
+			 			<select name="tomonth" style="width:30pt;">
+			 				<?php for($i=1; $i<=12; $i++){ ?>
+							<option value="<?=sprintf("%02d", $i)?>" <?php if($request->get("tomonth")==sprintf("%02d", $i)){ ?>selected<?php } ?>><?=sprintf("%02d", $i)?></option>
+							<?php } ?>
+						</select>
+					</td>
+					<td nowrap>月</td>
+					<td nowrap>
+			 			<select name="today" style="width:30pt;">
+			 				<?php for($i=1; $i<=31; $i++){ ?>
+							<option value="<?=sprintf("%02d", $i)?>" <?php if($request->get("today")==sprintf("%02d", $i)){ ?>selected<?php } ?>><?=sprintf("%02d", $i)?></option>
+							<?php } ?>
+						</select>
+					</td>
+					<td>日</td>
+				</tr>		
+			</table>
+ 		</td>
+ 	</tr>
+</table>
+<br><br>
+<table border="0" align="center" width="80%">
+	<tr>
+		<td>
+			<input type="button" name="doDownload" value=" CSVでダウンロード " style="width: 120pt;" class="button" onclick="doDownloadAction();">
+			<input type=hidden name="unique_id" value="<?=$request->get("unique_id")?>">
+			<input type="hidden" name="download" value="">
+		</td>
+		<td>
+			<input type="button" name="delete" value="指定期間のデータを削除" style="width: 120pt;" class="button" <?php if(!$ck_admin){ ?>disabled="true" <?php } ?>onclick="doDelAction();">
+			<input type="hidden" name="doDelete" value="">
+			<input type="hidden" name="winMode" value="main">
+		</td>
+		<td>
+	</tr>
+</table>
+</form>
+<iframe src="about:blank" style=" visibility:hidden;" name="delwin"></iframe>
+</body>
+</html>

@@ -1,0 +1,268 @@
+@charset "UTF-8";
+
+body
+{
+	margin-left :0;
+	margin-top :0;
+	margin-right:0;
+	background-color: white;
+	
+	font-size:12pt;
+	color:black;
+	font-family:"MS UI Gothic","MS PGothic";
+	
+}
+input,select
+{
+	font-family:"MS UI Gothic","MS PGothic";
+	font-size:12px;
+	color:black;
+}
+
+input.readonly
+{
+	background-color:#D7D7D7;
+	font-family:"MS UI Gothic","MS PGothic";
+	font-size:12px;
+	color:black;
+}
+
+input.telop
+{
+	background-color:#FFFFFF;
+	font-family:"MS UI Gothic","MS PGothic";
+	font-size:14px;
+	color:black;
+	border-color:Gray;
+	border-style:solid;
+	border-width :1px;
+	width :730px;
+}
+
+/*機種コンボボックス*/
+select.printer
+{
+	font-size:12px;
+	color:black;
+	width:160pt;
+}
+/*プリンター台数*/
+.printers
+{
+	border-style:solid;
+	border-color:black;
+	width:20pt;
+}
+
+/*紙枚数*/
+.papers
+{
+	border-style:solid;
+	border-color:black;
+	width:50pt;
+}
+
+/*border付きテーブル*/
+.withline
+{
+	font-size :11pt;
+	
+	border-width :1px;
+	border-style:groove;
+	border-color:Black ;
+}
+
+table.header
+{
+	background-color:#000066;
+}
+
+
+/*提案機、使用機の結果合計*/
+table.unit_total
+{
+	background-color: #99FF99;
+}
+
+/*削減効果エリア*/
+table.sim_result
+{
+	font-size :11pt;
+	
+	border-width :1px;
+	border-style:groove;
+	border-color:Black ;
+	
+	background-color:#99FF99;
+}
+
+/*機種の奇数行*/
+td.singlerow
+{
+	background-color:#99CCFF;
+	
+	font-size :12pt;
+	border-width :1px;
+	border-style:groove;
+	border-color:Black;
+}
+
+/*機種の偶数行*/
+td.doublerow
+{
+	background-color:#FFFFFF;
+	
+	font-size :12pt;
+	border-width :1px;
+	border-style:groove;
+	border-color:Black;
+}
+
+
+td.result
+{
+	background-color:#99FFFF;
+
+}
+
+
+/*TDのタイトル*/
+td.title
+{
+	font-size:15pt;
+	background-color:#99FFFF;
+	border-width :1px;
+	border-style:groove;
+	border-color:Black;
+}
+
+th
+{
+	font-family:"MS UI Gothic","MS PGothic";
+	font-weight:bold ;
+	font-size:11pt;
+	color:black;
+	background-color:#FFFF99;
+}
+
+td
+{
+	font-family:"MS UI Gothic","MS PGothic";
+	font-size:11pt;
+	color:black;
+}
+
+/*ページ上部のタイトル*/
+.PageTitle
+{
+	font-weight:bold ;
+	font-size :x-large ;
+	color:white;
+}
+
+/*メニュー画面のボタン*/
+.MenuButton{
+	font-size:14pt;
+	color:black;
+	font-weight:900;
+	width:180pt;
+	padding: 10px 0;
+	border-width :medium ;
+	border-style:outset;
+}
+
+/*メニューへと閉じる*/
+.CloseButton
+{
+	font-size:11pt;
+	color:black;
+	border-width :thin;
+}
+
+/*通常のボタン*/
+.button
+{
+	font-size:11pt;
+	color:black;
+	border-width:thin;
+	border-style :outset;
+}
+
+/*シミュレーション画面のボタン*/
+.button_on_sim
+{
+	font-size:11pt;
+	color:black;
+	border-width:thin;
+	border-style :outset;
+	width: 150px;
+}
+
+/*シミュレーション画面のクイックレポート用ボタンスタイル*/
+#doCopy
+{
+	font-size:11pt;
+	color:black;
+	border-width:thin;
+	border-style :outset;
+	background-color: #FFFF66;
+}
+
+
+/*データ一覧の中のボタン*/
+.ListButton
+{
+	font-size:10pt;
+	color:black;
+	border-width :thin;
+	border-style :outset;
+}
+
+/*type=file　のコントロール*/
+.Upload
+{
+	font-size:11pt;
+	color:black;
+	border-width :thin;
+	border-style :groove;
+}
+
+/*コメント*/
+.comment
+{
+	font-size:10pt;
+	color:Red ;
+}
+
+label {
+	font-size:11pt;
+	color:Black ;
+}
+
+h1 {
+	color : red;
+}
+
+
+.error
+{
+	font-family:"MS UI Gothic","MS PGothic";
+	font-size:12pt;
+	color:red ;
+}
+
+textarea.log
+{
+	font-family:"MS UI Gothic","MS PGothic";
+	font-size:12pt;
+	width:100%;
+	height:120px;
+}
+
+textarea.sim
+{
+	font-family:"MS UI Gothic","MS PGothic";
+	font-size:12pt;
+	width:100%;
+	height:350px;
+}
