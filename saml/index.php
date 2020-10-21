@@ -14,6 +14,7 @@ require_once '../class/session.php';
 $request =new request();
 $session =new session();
 $result  =new result();
+
 $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
 
@@ -112,19 +113,33 @@ if (isset($_GET['sso'])) {
 }
 
 if (isset($_SESSION['samlUserdata'])) {
+
     $session->add("user_lebel",'9');
     $session->add("user_id",'9');
     $result->add("ResultStatus","Successful");
-    $result->add("saml","true");
-     header("Location: ../Menu.php");
-    if (!empty($_SESSION['samlUserdata'])) {
+    $session->add("saml","true");
+
+
+    if (empty($_SESSION['samlUserdata'])) {
         $attributes = $_SESSION['samlUserdata'];
         foreach ($attributes as $attributeName => $attributeValues) {
             foreach ($attributeValues as $attributeValue) {
                 $session->add($attributeName,$attributeValue);
             }
         }
+        $this->session->add("user_unique_id" , md5(microtime()) . md5(microtime() . $this->request->get("sAMAccountName")));
+        $session->add("user_id",$session->get("sAMAccountName"));
+        $session->add("user_name",$session->get("cn"));
+        $session->add("corp_cd",$session->get("o"));
+        $session->add("corp_name",$session->get("company"));
+        $session->add("shozoku_cd",$session->get("departmentNumber"));
+        $session->add("shozoku_name",$session->get("info"));
+        $session->add("user_lebel",$session->get("9"));
+
+
+
     }
+    header("Location: ../Menu.php");
     if (!empty($_SESSION['samlUserdata'])) {
         $attributes = $_SESSION['samlUserdata'];
         echo 'You have the following attributes:<br>';
