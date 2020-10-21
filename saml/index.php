@@ -85,8 +85,12 @@ if (isset($_GET['sso'])) {
         exit();
     }
 
-    $_SESSION['samlUserdata'] = $auth->getAttributes();
-    $_SESSION['samlNameId'] = $auth->getNameId();
+    //$_SESSION['samlUserdata'] = $auth->getAttributes();
+    $attr=$auth->getAttributes();
+    echo "<pre>";
+    print_r($attr);
+    echo "</pre>";
+    $_SESSION['UserId'] =$attr['user_id'];
     $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
     $_SESSION['samlNameIdNameQualifier'] = $auth->getNameIdNameQualifier();
     $_SESSION['samlNameIdSPNameQualifier'] = $auth->getNameIdSPNameQualifier();
@@ -135,9 +139,6 @@ if (isset($_SESSION['samlUserdata'])) {
         $session->add("shozoku_cd",$session->get("departmentNumber"));
         $session->add("shozoku_name",$session->get("info"));
         $session->add("user_lebel",$session->get("9"));
-
-
-
     }
     header("Location: ../Menu.php");
     if (!empty($_SESSION['samlUserdata'])) {

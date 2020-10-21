@@ -19,9 +19,9 @@ $controller =new MenuController($request, $session, $result);
 $controller->connectdb();
 $controller->execute();
 $controller->closedb();
-if($session->get("saml")=="true"){
-    $controller->insertlog();
-}
+//if($session->get("saml")=="true"){
+//    $controller->insertlog();
+//}
 if($result->get("ResultStatus") == "Successful") {
 	include_once("view/Menu.html");
 }

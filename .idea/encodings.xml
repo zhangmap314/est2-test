@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/saml/settings.php" charset="windows-31j" />
-    <file url="file://$PROJECT_DIR$/saml/vendor/onelogin/php-saml/demo1/settings.php" charset="windows-31j" />
-    <file url="file://$PROJECT_DIR$/saml/vendor/onelogin/php-saml/demo2/settings.php" charset="windows-31j" />
-  </component>
-</project>
