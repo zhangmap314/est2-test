@@ -4,9 +4,8 @@
  *  SAML Metadata view
  */
 
-require_once dirname(__DIR__).'/saml/_toolkit_loader.php';
-
-require_once 'settings.php' ;
+require_once 'settings.php';
+require_once 'onelogin/_toolkit_loader.php';
 
 try {
     #$auth = new OneLogin_Saml2_Auth($settingsInfo);

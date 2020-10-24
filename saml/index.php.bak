@@ -3,8 +3,7 @@
  *  SAML Handler
  */
 
-require_once 'common.php';
-session_start();
+
 require_once 'onelogin/_toolkit_loader.php';
 require_once 'settings.php';
 
@@ -80,23 +79,11 @@ if (isset($_GET['sso'])) {
 
     $_SESSION['samlUserdata'] = $auth->getAttributes();
     $attr=$auth->getAttributes();
-
-    /*For sf */
-    $_SESSION['user_id'] =$attr['username'][0];
-    $_SESSION['user_name'] =$attr['username'][0];
-    $_SESSION['corp_cd'] =$attr['username'][0];
-    $_SESSION['corp_name'] =$attr['username'][0];
-    $_SESSION['shozoku_cd'] =$attr['username'][0];
-    $_SESSION['shozoku_name'] =$attr['username'][0];
-    /*For adfs 
-    $_SESSION['user_id'] =$attr['sAMAccountName'][0];
-    $_SESSION['user_name'] =$attr['cn'][0];
-    $_SESSION['corp_cd'] =$attr['o'][0];
-    $_SESSION['corp_name'] =$attr['company'][0];
-    $_SESSION['shozoku_cd'] =$attr['departmentNumber'][0];
-    $_SESSION['shozoku_name'] =$attr['department'][0];
-    */
-    
+    $_SESSION['UserId'] =$attr['username'][0];]
+    echo "<pre>";
+echo __DIR__ . '<br/>';
+    print_r($attr);
+    echo "</pre>";
     $_SESSION['samlNameId'] = $auth->getNameId();
     $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
     $_SESSION['samlNameIdNameQualifier'] = $auth->getNameIdNameQualifier();
@@ -106,7 +93,6 @@ if (isset($_GET['sso'])) {
     if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
         $auth->redirectTo($_POST['RelayState']);
     }
-
 } else if (isset($_GET['sls'])) {
     if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
         $requestID = $_SESSION['LogoutRequestID'];
@@ -123,24 +109,9 @@ if (isset($_GET['sso'])) {
     }
 }
 
-
 if (isset($_SESSION['samlUserdata'])) {
     if (!empty($_SESSION['samlUserdata'])) {
-        $uid = $_SESSION['user_id'];
-        $hash_v = common::make_hash_v($uid);
-        $caller = $_SESSION['caller'];
-//        header("Location: ../Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
-//        exit;
-
         $attributes = $_SESSION['samlUserdata'];
-echo '<pre>';
-print_r($attributes);
-echo 'user_id='.$uid.'<br/>';
-echo 'hash_v='.$hash_v.'<br/>';
-echo 'caller='.$caller.'<br/>';
-
-echo '</pre>';
-
         echo 'You have the following attributes:<br>';
         echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
         foreach ($attributes as $attributeName => $attributeValues) {
@@ -160,4 +131,3 @@ echo '</pre>';
     echo '<p><a href="?sso" >Login</a></p>';
     echo '<p><a href="?sso2" >Login and access to attrs.php page</a></p>';
 }
-

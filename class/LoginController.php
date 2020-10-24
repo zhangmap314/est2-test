@@ -11,93 +11,98 @@ class LoginController extends basecontroller{
         parent::__destruct();
     }
 
-    public function execute(){
-        if($this->request->get("clear") != ""){
-            $this->request->add("userid", "");
-            $this->result->add("ResultStatus","DoLogin");
-            return false;
-        }
-        //呼出し元のチェック
-        if(!$this->checkcaller()){
-            $this->result->add("ResultStatus","DenyAccess");
-            return false;
-        }
+	public function execute(){
+		if($this->request->get("clear") != ""){
+			$this->request->add("userid", "");
+			$this->result->add("ResultStatus","DoLogin");
+			return false;
+		}
+		//呼出し元のチェック
+		if(!$this->checkcaller()){
+			$this->result->add("ResultStatus","DenyAccess");
+			return false;
+		}
+		
+		$this->session->add("caller", $this->request->get("caller") );
+		
+		if($this->session->get("loginSAML")=='0'){
+			/*ユーザIDまたはパスワードがない場合はログイン画面を表示*/
+			if( $this->request->get("userid") == "" ||
+				$this->request->get("userpw") == ""){
+				
+				$this->result->add("ResultStatus","DoLogin");
+				return false;
+			}
+			
+			/*パスワードが暗号化されている場合(ログイン画面より遷移の場合は復号処理しない)*/
+			if( $this->request->get("systemloginparam") != "noenc"){
+				$this->pwdecoding();
+			}
+			//ユーザ情報取得
+			$this->getuserinfo();
+			
+			if($this->session->get("status") != "1" ){
+				$this->result->add("errmsg","ユーザIDは無効になっています。");
+				$this->result->add("ResultStatus","DoLogin");
+				return false;
+			}
+			if($this->session->get("ldap_auth_flg") == '1'){
+				/*LDAP認証*/
+				if(!$this->ldapauth()){
+					$this->result->add("errmsg","LDAP認証失敗しました。");
+					$this->result->add("ResultStatus","DoLogin");
+					return false;
+				}
+			}else{
+				if($this->request->get("userpw") != $this->result->get("user_pw")){
+					$this->result->add("errmsg","ユーザIDまたはパスワードが違います。");
+					$this->result->add("ResultStatus","DoLogin");
+					return false;
+				}
+			}
 
-        $this->session->add("caller", $this->request->get("caller") );
+		} else {
+			if( $this->request->get("userid") == "") {
+				$this->saml();
+				return false;
+			}
+			//ユーザ情報取得
+			$this->getuserinfo();
+			if($this->session->get("status") != "1" ){
+				$this->result->add("errmsg","ユーザIDは無効になっています。");
+				$this->result->add("ResultStatus","DoLogin");
+				return false;
+			}
+			if ( $this->request->get("hash_v") == "" ||
+				 $this->request->get("hash_v") != common::make_hash_v($this->request->get("userid"))) {
+				if($this->session->get("ldap_auth_flg") == '1'){
+					$this->saml();
+					return false;
+				}else{
+					if($this->request->get("userpw") != $this->result->get("user_pw")){
+						if ($this->request->get("userpw") != "") {
+							$this->result->add("errmsg","ユーザIDまたはパスワードが違います。");
+						}
+						$this->result->add("ResultStatus","DoLogin");
+						return false;
+					}
+				}
+			}
+		}
 
-        /*ユーザIDまたはパスワードがない場合はログイン画面を表示*/
-        if( $this->request->get("userid") == "" ||
-            $this->request->get("userpw") == ""){
-            if($this->session->get("loginC")==1){
-            $this->result->add("ResultStatus","DoLogin");
-            return false;
-            }
-            if($this->session->get("loginC")==2){
-                if($this->request->get("hash_v")!=""){
-                    $this->result->add("ResultStatus","DenyAccess");
-                    return false;
-                }else{
-                    $this->saml();
-                }
-            }
-        }
+		$this->result->add("ResultStatus","LoginSuccessful");	
+		$this->session->add("user_unique_id" , md5(microtime()) . md5(microtime() . $this->request->get("userid")));
 
-        /*パスワードが暗号化されている場合(ログイン画面より遷移の場合は復号処理しない)*/
-        if( $this->request->get("systemloginparam") != "noenc"){
-            $this->pwdecoding();
-        }
-        //ユーザ情報取得
-        $this->getuserinfo();
-
-        if($this->session->get("status") != "1" ){
-            $this->result->add("errmsg","ユーザIDは無効になっています。");
-            $this->result->add("ResultStatus","DoLogin");
-            return false;
-        }
-        if($this->session->get("loginC")=='1'){
-        if($this->session->get("ldap_auth_flg") == '1'){
-            /*LDAP認証*/
-            if(!$this->ldapauth()){
-                $this->result->add("errmsg","LDAP認証失敗しました。");
-                $this->result->add("ResultStatus","DoLogin");
-                return false;
-            }
-        }else{
-            if($this->request->get("userpw") != $this->result->get("user_pw")){
-                $this->result->add("errmsg","ユーザIDまたはパスワードが違います。");
-                $this->result->add("ResultStatus","DoLogin");
-                return false;
-            }
-        }
-            $this->result->add("ResultStatus","LoginSuccessful");
-        }
-        //LDAP以外の場合
-        if($this->session->get("loginC")==2){
-            if($this->request->get("userpw") != $this->result->get("user_pw")){
-
-                $this->saml();
-                return false;
-            }
-            else {
-                $this->result->add("ResultStatus","LoginSuccessful");
-            }
-        }
-
-
-
-        $this->session->add("user_unique_id" , md5(microtime()) . md5(microtime() . $this->request->get("userid")));
-
-        if($this->session->get("user_lebel") == USER_LEBEL_ADMIN ||
-            $this->session->get("user_lebel") == USER_LEBEL_LOGGER){//管理者またはログ取得者の場合はログインログを生成
-
-            if(!$this->insertlog()){
-                $this->result->add("systemerror", "ログデータを生成できませんでした。");
-                $this->showerrorpage();
-                return false;
-            }
-        }
-
-    }
+		if($this->session->get("user_lebel") == USER_LEBEL_ADMIN || 
+			$this->session->get("user_lebel") == USER_LEBEL_LOGGER){//管理者またはログ取得者の場合はログインログを生成
+			
+			if(!$this->insertlog()){
+				$this->result->add("systemerror", "ログデータを生成できませんでした。");
+				$this->showerrorpage();
+				return false;
+			}
+		}
+	}
 
     protected function getuserinfo(){
         //ユーザマスタからユーザ情報を検索
@@ -142,11 +147,11 @@ class LoginController extends basecontroller{
             return false;
         };
         if(substr($data[0]["caller_name"],0,4)=="LDAP"){
-            $this->session->add("loginC", "1");
+            $this->session->add("loginSAML", "0");
             return  true;
         }else{
 
-            $this->session->add("loginC", "2");
+            $this->session->add("loginSAML", "1");
             return  true;
         }
         return false;
@@ -298,11 +303,7 @@ class LoginController extends basecontroller{
     }
 
     private function saml(){
-        header("Location:https://localhost/est2-test/saml/index.php?sso");
-
-    }
-
-    private function samlLogin(){
+        header("Location: ./saml/index.php?sso");
 
     }
 }

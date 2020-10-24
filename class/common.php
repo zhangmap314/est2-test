@@ -75,5 +75,10 @@ class common{
 		}
 		return $rtn;
 	}
+	
+	static function make_hash_v($val){
+		$hash_v_key = $val.'8086';
+		return base64_encode(md5($hash_v_key));
+	}
 }
 ?>

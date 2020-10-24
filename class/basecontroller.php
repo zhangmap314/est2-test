@@ -14,13 +14,14 @@ class basecontroller{
 	public $enablecontextmenu = false;
 	
 	/*db接続文字列*/
-	private $connstr		= "host=127.0.0.1 port=5433 dbname=estweb2_test user=estweb2_test password=zhangwei";
+	private $connstr		= "host=127.0.0.1 port=5432 dbname=estweb2_test user=estweb2_test password=estweb2_test";
 	
 	//public $simulation_max_rows = 4;		//シミュレーション画面の機種行数
 	public $simulation_max_rows = 99;		//表示行数用ドロップダウンリスト上限
 	
 	public $ricoh_maker_cd = "10";			//リコーのメーカーコード
 	
+	public $hash_v_key = '8086';		//KIZUNavi or SAHOO用hash_v認証用キー
 	
 	/*
 	protected $ldapserver = "192.168.242.181";		//LDAPサーバーアドレス(テスト環境)
