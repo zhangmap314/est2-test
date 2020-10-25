@@ -21,8 +21,6 @@ class basecontroller{
 	
 	public $ricoh_maker_cd = "10";			//リコーのメーカーコード
 	
-	public $hash_v_key = '8086';		//KIZUNavi or SAHOO用hash_v認証用キー
-	
 	/*
 	protected $ldapserver = "192.168.242.181";		//LDAPサーバーアドレス(テスト環境)
 	protected $ldapport = 389;						//LDAPポート番号
@@ -204,7 +202,6 @@ class basecontroller{
 				 "caller_id" => $this->session->get("caller"),
 				 "login_time" => date("Y/m/d H:i:s")
 				 );
-		
 		return $this->db->insert("tbl_login_log", $logdata);
 	}
 	

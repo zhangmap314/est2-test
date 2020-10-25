@@ -4,9 +4,9 @@
  */
 
 require_once 'common.php';
+require_once 'settings.php';
 session_start();
 require_once 'onelogin/_toolkit_loader.php';
-require_once 'settings.php';
 
 $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
@@ -79,7 +79,7 @@ if (isset($_GET['sso'])) {
     }
 
     $_SESSION['samlUserdata'] = $auth->getAttributes();
-    $attr=$auth->getAttributes();
+    $attr=$_SESSION['samlUserdata'];
 
     /*For sf */
     $_SESSION['user_id'] =$attr['username'][0];
@@ -103,10 +103,24 @@ if (isset($_GET['sso'])) {
     $_SESSION['samlNameIdSPNameQualifier'] = $auth->getNameIdSPNameQualifier();
     $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
     unset($_SESSION['AuthNRequestID']);
+
+    $uid = $_SESSION['user_id'];
+    $hash_v = common::make_hash_v($uid);
+/*    
+    header("Location: ../Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
+    
     if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
         $auth->redirectTo($_POST['RelayState']);
-    }
 
+    }
+*/
+echo '<pre>';
+echo $uid;
+echo $hash_v;
+echo $_SESSION['caller'];
+print_r($_SESSION);
+print_r($_POST);
+echo '</pre>';
 } else if (isset($_GET['sls'])) {
     if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
         $requestID = $_SESSION['LogoutRequestID'];
@@ -126,20 +140,7 @@ if (isset($_GET['sso'])) {
 
 if (isset($_SESSION['samlUserdata'])) {
     if (!empty($_SESSION['samlUserdata'])) {
-        $uid = $_SESSION['user_id'];
-        $hash_v = common::make_hash_v($uid);
-        $caller = $_SESSION['caller'];
-//        header("Location: ../Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
-//        exit;
-
         $attributes = $_SESSION['samlUserdata'];
-echo '<pre>';
-print_r($attributes);
-echo 'user_id='.$uid.'<br/>';
-echo 'hash_v='.$hash_v.'<br/>';
-echo 'caller='.$caller.'<br/>';
-
-echo '</pre>';
 
         echo 'You have the following attributes:<br>';
         echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
