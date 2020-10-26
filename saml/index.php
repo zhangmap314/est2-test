@@ -106,21 +106,16 @@ if (isset($_GET['sso'])) {
 
     $uid = $_SESSION['user_id'];
     $hash_v = common::make_hash_v($uid);
-/*    
-    header("Location: ../Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
-    
-    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-        $auth->redirectTo($_POST['RelayState']);
+    $caller = $_SESSION['caller'];
+   
+    header("Location:../Login.php?CALLER=$caller&LOGIN_ID=$uid&HASH_V=$hash_v");
 
-    }
-*/
-echo '<pre>';
-echo $uid;
-echo $hash_v;
-echo $_SESSION['caller'];
-print_r($_SESSION);
-print_r($_POST);
-echo '</pre>';
+//    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
+//        $auth->redirectTo($_POST['RelayState']);
+//
+//    }
+
+
 } else if (isset($_GET['sls'])) {
     if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
         $requestID = $_SESSION['LogoutRequestID'];
