@@ -108,7 +108,7 @@ if (isset($_GET['sso'])) {
     $hash_v = common::make_hash_v($uid);
     $caller = $_SESSION['caller'];
    
-    header("Location:../Login.php?CALLER=$caller&LOGIN_ID=$uid&HASH_V=$hash_v");
+    header("Location:../Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
 
 //    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
 //        $auth->redirectTo($_POST['RelayState']);
