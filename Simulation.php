@@ -40,11 +40,11 @@ if($result->get("nolog", false) === true){
 	header("Location: ./SimWarning.php");
 }else{
 	if($request->get("action") == "printout" ){
-		include_once("view/SimPrint.html");
+		include_once("SimPrint.html");
 	}elseif($request->get("action") != "download" &&
 			$request->get("action") != "dlformacro"){
 			
-		include_once("view/Simulation.html");
+		include_once("Simulation.html");
 	}
 }
 

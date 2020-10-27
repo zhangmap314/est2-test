@@ -35,9 +35,9 @@ case "DenyAccess":
 default:
 	if($request->get("action")!="download"){
 		if( $request->get("winMode") != "sub" ){
-			include_once("view/LogMnt.html");
+			include_once("LogMnt.html");
 		}else{
-			include_once("view/LogDel.html");
+			include_once("LogDel.html");
 		}
 		break;
 	}

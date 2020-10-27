@@ -51,7 +51,7 @@ switch($result->get("ResultStatus")) {
 		break;
 	default:
 		if($request->get("action") != "download"){
-			include_once("view/EcoInfoMnt2.html");
+			include_once("EcoInfoMnt2.html");
 			break;
 		}
 }

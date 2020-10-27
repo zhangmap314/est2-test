@@ -47,7 +47,7 @@ $controller->execute();
 $controller->closedb();
 
 if($request->get("action") != "downloadcsv"){
-	include_once("view/ProductList.html");
+	include_once("ProductList.html");
 }
 
 unset($request);

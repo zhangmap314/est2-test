@@ -25,11 +25,11 @@ $controller->execute();
 $controller->closedb();
 
 if($result->get("ResultStatus") == "Successful") {
-		include_once("view/SimWarning.html");
+		include_once("SimWarning.html");
 }
 elseif($result->get("ResultStatus") == "ToSimulation") {
 		$result->add("redirect","redirect");
-		include_once("view/SimWarning.html");
+		include_once("SimWarning.html");
 }
 else{ 
 	$controller->denyaccess();

@@ -34,7 +34,7 @@ $controller->execute();
 $controller->closedb();
 
 if($result->get("ResultStatus") == "Successful"){
-	include_once("view/UserMnt.html");
+	include_once("UserMnt.html");
 }else{ 
 	$controller->denyaccess();
 }

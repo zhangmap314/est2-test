@@ -42,7 +42,7 @@ case "DenyAccess":
 	$controller->denyaccess();
 	break;
 default:
-	include_once("view/ProductEntry.html");
+	include_once("ProductEntry.html");
 	break;
 }
 

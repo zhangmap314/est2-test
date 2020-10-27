@@ -26,7 +26,7 @@ $controller->execute();
 $controller->closedb();
 
 if($result->get("ResultStatus") == "Successful") {
-		include_once("view/LogWarning.html");
+		include_once("LogWarning.html");
 }
 elseif($result->get("ResultStatus") == "LogMnt") {
 		header("Location: ./LogMnt.php");

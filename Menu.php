@@ -23,7 +23,7 @@ $controller->closedb();
 //    $controller->insertlog();
 //}
 if($result->get("ResultStatus") == "Successful") {
-	include_once("view/Menu.html");
+	include_once("Menu.html");
 }
 else{ 
 	$controller->denyaccess();

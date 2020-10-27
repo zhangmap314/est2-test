@@ -35,7 +35,7 @@ $controller->closedb();
 				$result->add("warnningmsg", $filebuf);		
 			}
 		}
-				include_once("view/Warnning.html");
+				include_once("Warnning.html");
 
 unset($request);
 unset($session);

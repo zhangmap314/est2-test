@@ -33,7 +33,7 @@ case "DenyAccess":
 	$controller->denyaccess();
 	break;
 default:
-	include_once("view/Upload.html");
+	include_once("Upload.html");
 	break;
 }
 

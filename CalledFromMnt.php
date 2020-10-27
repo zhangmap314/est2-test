@@ -30,7 +30,7 @@ $controller->execute();
 $controller->closedb();
 
 if($result->get("ResultStatus") == "Successful") {
-	include_once("view/CalledFromMnt.html");
+	include_once("CalledFromMnt.html");
 }
 else{ 
 	$controller->denyaccess();

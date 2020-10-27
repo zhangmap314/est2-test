@@ -70,7 +70,7 @@ case "DenyAccess":
 	header("Location: ./Denied.html");
 	break;
 case "DoLogin":
-	include_once("view/Login.html");
+	include_once("Login.html");
 	break;
 case "LoginSuccessful":
 	if($session->get("user_lebel") == USER_LEBEL_ADMIN || 

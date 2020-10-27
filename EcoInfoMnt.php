@@ -56,7 +56,7 @@ if($result->get("ResultStatus") == "Successful") {
 	if($request->get("action") == "download"){
 		//DLなのでなにもしない
 	}else{
-		include_once("view/EcoInfoMnt.html");
+		include_once("EcoInfoMnt.html");
 	}
 }
 else{ 
