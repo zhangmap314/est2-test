@@ -188,8 +188,8 @@ class basecontroller{
 		
 		return $data[0]["saveno"];
 	}
-	
-	public function insertlog(){
+
+	protected function insertlog(){
 		$logdata = array("save_no" => $this->getsaveno(),
 				 "unique_id" => common::sqlescape($this->session->get("user_unique_id")),
 				 "user_id" => common::sqlescape($this->session->get("user_id")),
