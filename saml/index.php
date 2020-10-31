@@ -12,7 +12,12 @@ $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
 
 if (isset($_GET['sso'])) {
-    $auth->login();
+    $uid = $_SESSION['user_id'];
+    $hash_v = common::make_hash_v($uid);
+    $caller = $_SESSION['caller'];
+    $path = basename(realpath("../"));
+    $auth->login("/$path/Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
+//    header("Location:../Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
 
     # If AuthNRequest ID need to be saved in order to later validate it, do instead
     # $ssoBuiltUrl = $auth->login(null, array(), false, false, true);
@@ -81,21 +86,21 @@ if (isset($_GET['sso'])) {
     $_SESSION['samlUserdata'] = $auth->getAttributes();
     $attr=$_SESSION['samlUserdata'];
 
-    /*For sf */
+    /*For sf 
     $_SESSION['user_id'] =$attr['username'][0];
     $_SESSION['user_name'] =$attr['username'][0];
     $_SESSION['corp_cd'] =$attr['username'][0];
     $_SESSION['corp_name'] =$attr['username'][0];
     $_SESSION['shozoku_cd'] =$attr['username'][0];
     $_SESSION['shozoku_name'] =$attr['username'][0];
-    /*For adfs 
+    */
+    /*For adfs */
     $_SESSION['user_id'] =$attr['sAMAccountName'][0];
     $_SESSION['user_name'] =$attr['cn'][0];
     $_SESSION['corp_cd'] =$attr['o'][0];
     $_SESSION['corp_name'] =$attr['company'][0];
     $_SESSION['shozoku_cd'] =$attr['departmentNumber'][0];
     $_SESSION['shozoku_name'] =$attr['department'][0];
-    */
     
     $_SESSION['samlNameId'] = $auth->getNameId();
     $_SESSION['samlNameIdFormat'] = $auth->getNameIdFormat();
@@ -104,17 +109,9 @@ if (isset($_GET['sso'])) {
     $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
     unset($_SESSION['AuthNRequestID']);
 
-    $uid = $_SESSION['user_id'];
-    $hash_v = common::make_hash_v($uid);
-    $caller = $_SESSION['caller'];
-   
-    header("Location:../Login.php?caller=$caller&userid=$uid&hash_v=$hash_v");
-
-//    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-//        $auth->redirectTo($_POST['RelayState']);
-//
-//    }
-
+    if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
+        $auth->redirectTo($_POST['RelayState']);
+    }
 
 } else if (isset($_GET['sls'])) {
     if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
