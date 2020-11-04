@@ -74,7 +74,7 @@ class LoginController extends basecontroller{
 				return false;
 			}
 			if ( $this->request->get("hash_v") == "" ||
-				 $this->request->get("hash_v") != common::make_hash_v($this->request->get("userid"))) {
+				 $this->request->get("hash_v") != common::make_hash_v($this->request->get("userid").$this->request->get("caller"))) {
 				if($this->session->get("ldap_auth_flg") == '1'){
 					$this->saml();
 					return false;

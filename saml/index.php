@@ -13,9 +13,7 @@ $auth = new OneLogin_Saml2_Auth($settingsInfo);
 
 if (isset($_GET['sso'])) {
     $caller = $_SESSION['caller'];
-    $path = basename(realpath("../"));
-    $auth->login("/$path/Login.php?CALLER=$caller");
-//    header("Location:../Login.php?CALLER=$caller&LOGIN_ID=$uid&HASH_V=$hash_v");
+    $auth->login($caller);
 
     # If AuthNRequest ID need to be saved in order to later validate it, do instead
     # $ssoBuiltUrl = $auth->login(null, array(), false, false, true);
@@ -107,11 +105,14 @@ if (isset($_GET['sso'])) {
     $_SESSION['samlSessionIndex'] = $auth->getSessionIndex();
     unset($_SESSION['AuthNRequestID']);
 
-    $uid = $_SESSION['user_id'];
-    $hash_v = common::make_hash_v($uid);
     if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-        $auth->redirectTo($_POST['RelayState']. "&LOGIN_ID=$uid&HASH_V=$hash_v");
+        $uid = $_SESSION['user_id'];
+        $path = basename(realpath("../"));
+        $caller = $_POST['RelayState'];
+        $hash_v = common::make_hash_v($uid.$caller);
+        $auth->redirectTo("/$path/Login.php?CALLER=$caller&LOGIN_ID=$uid&HASH_V=$hash_v");
     }
+//    header("Location:../Login.php?CALLER=$caller&LOGIN_ID=$uid&HASH_V=$hash_v");
 
 } else if (isset($_GET['sls'])) {
     if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
