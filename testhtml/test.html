@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>シミュレータページ </title>
+    <link rel="stylesheet" type="text/css" href="Login.css"/>
+
+    <script src="md5.js"></script>
+    <script >
+
+
+        function validateForm() {
+            var x = document.forms["from"]["all"].value;
+            window.open(x,"_self");
+        }
+
+        function buildUrl(obj){
+            var username = document.getElementById("username");
+            var caller = document.getElementById("caller");
+            var usepwd = document.getElementById("usepwd");
+            var url='http://localhost/est2-test/Login.php?';
+            if(caller.value!=''){
+                url+="CALLER="+caller.value
+               all.value=url;
+            }
+            if(username.value!=''){
+
+                url+="&LOGIN_ID="+username.value
+                if(caller.value!=''){
+                url+="&HASH_V="+window.btoa(MD5(caller.value+username.value+8086));
+
+                }
+                all.value=url;
+            }
+            var usepwdMi=0;
+            if(usepwd.value!=''){
+
+                for(var i=usepwd.value.length-1;i>=0;i--){
+                    var str = usepwd.value.charAt(i);
+                    var code = str.charCodeAt()*7;
+                    usepwdMi+=code;
+
+                }
+
+                url+="&PASS_ID="+usepwdMi;
+                all.value=url;
+            }
+
+        }
+
+    function onclickUrl(){
+        var x = document.forms["from"]["all"].value;
+        alert(x);
+        window.open(x,"_self");
+
+    }
+    </script>
+</head>
+<body>
+<div id="login">
+    <h1>シミュレータページ</h1>
+    <form id="from"   onsubmit="return validateForm()">
+      <select style=" color: #fff;" id="caller" onchange="buildUrl(this)">
+            <option value="">なし</option>
+          <option value="31">CALLER31</option>
+            <option value="21">CALLER21</option>
+          <option value="13">CALLER13</option>
+            <option value="11">CALLER11</option>
+
+        </select>
+        <input type="text"  id="username" onkeyup="buildUrl(this)" placeholder="ユーザー名" ></input>
+        <input type="password"  id ="usepwd"  onkeyup="buildUrl(this)"  placeholder="パスワード" ></input>
+
+        <textarea type='text' id='all'></textarea>
+        <button class="but"   type="button" onclick="onclickUrl()">ログイン</button>
+    </form>
+    <p id="demo">
+</div>
+</body>
+
+</html>
